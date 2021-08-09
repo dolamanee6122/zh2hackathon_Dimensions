@@ -54,6 +54,7 @@ const shopSchema = new Schema(
         balance: BalanceSchema,
       },
     ],
+    requestList: [],
   },
   { timestamps: true }
 );

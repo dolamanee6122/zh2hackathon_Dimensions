@@ -46,4 +46,5 @@ router.post("/addBuyer", async (req, res) => {
   });
 });
 
+router.post("/addRequest", async (req, res) => {});
 module.exports = router;
