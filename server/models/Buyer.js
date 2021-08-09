@@ -10,6 +10,11 @@ const BuyerSchema = new Schema(
       type: UserSchema,
       required: true,
     },
+    rating: {
+      type: Number,
+      required: true,
+      default: 50,
+    },
     balanceShopWise: [
       {
         shopID: {

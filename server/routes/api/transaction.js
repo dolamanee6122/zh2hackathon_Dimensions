@@ -4,6 +4,7 @@ const Transaction = require("../../models/Transaction");
 const Merchant = require("../../models/Merchant");
 const Shop = require("../../models/Shop");
 const Buyer = require("../../models/Buyer");
+//const Request = require("../../models/Buyer");
 
 // update balance of buyer for the current transaction
 const updateBalanceBuyer = (buyer, shopID, transaction, recordType, amount) => {
@@ -103,65 +104,91 @@ const updateBalance = (
 
 router.post("/", async (req, res) => {
   //console.log(req.body);
-  const {
-    buyerID,
-    shopID,
-    amount,
-    currency,
-    recordType,
-    remarks,
-    paymentMode,
-    attributes,
-  } = req.body;
+  const { requestID, attributes } = req.body;
 
-  try {
-    const transaction = new Transaction({
-      buyerID,
-      shopID,
+  Request.findById(requestID, (err, request) => {
+    if (err) return console.log(err);
+    //console.log(`request`, request);
+    const {
+      buyer: { buyerID },
+      shop: { shopID },
       amount,
-      currency,
-      recordType,
-      remarks,
       paymentMode,
-      attributes,
-    });
+      recordType,
+    } = request;
+    currency = "INR";
+    // const trxnRequest = {
+    //   buyerID: request.buyer.buyerID,
+    //   shopID: request.shop.shopID,
+    //   amount: request.amount,
+    //   paymentMode: request.paymentMode,
+    //   recordType: request.recordType,
+    //   currency: "INR",
+    //   attributes,
+    // };
 
-    Buyer.findById(buyerID, async (err, buyer) => {
-      if (err) return console.log(err);
-      Shop.findById(shopID, async (err, shop) => {
+    try {
+      const transaction = new Transaction({
+        buyerID,
+        shopID,
+        amount,
+        paymentMode,
+        recordType,
+        currency,
+        attributes,
+      });
+
+      //TODO handle case when buyerID, shopID, merchantID not found
+      //TODO check if the request has been already approved or failed
+      Buyer.findById(request.buyer.buyerID, async (err, buyer) => {
         if (err) return console.log(err);
-        const merchantID = shop.merchantID;
-        Merchant.findById(merchantID, async (err, merchant) => {
+        Shop.findById(request.shop.shopID, async (err, shop) => {
           if (err) return console.log(err);
-          //console.log(merchant);
+          const merchantID = shop.merchantID;
+          Merchant.findById(merchantID, async (err, merchant) => {
+            if (err) return console.log(err);
+            //console.log(merchant);
 
-          updateBalance(
-            buyer,
-            shop,
-            merchant,
-            transaction,
-            recordType,
-            amount,
-            currency
-          );
-          //await user.save();
-          //await shop.save();
-          //await merchant.save();
-          await transaction.save();
+            updateBalance(
+              buyer,
+              shop,
+              merchant,
+              transaction,
+              recordType,
+              amount,
+              currency
+            );
+            await buyer.save();
+            await shop.save();
+            await merchant.save();
+            await transaction.save();
 
-          return res.json({
-            status: "Payment Successful...",
-            buyer,
-            shop,
-            merchant,
-            transaction,
+            request.status = "APPROVED";
+            await request.save();
+            //console.log(`request`, request);
+            return res.json({
+              status: "Payment Successful...",
+              buyer,
+              shop,
+              merchant,
+              transaction,
+              request,
+            });
           });
         });
       });
-    });
-  } catch (err) {
-    console.log(err);
-  }
+    } catch (err) {
+      console.log(err);
+    }
+  });
+});
+
+router.get("/:id", (req, res) => {
+  const { id } = req.params;
+  Transaction.findById(id, (err, transaction) => {
+    if (err) return res.status(404).json({ error: err });
+    res.json({ message: "OK", transaction });
+  });
 });
 
 module.exports = router;
