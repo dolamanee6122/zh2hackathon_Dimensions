@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require("bcryptjs");
 
+// Address Schema
 const AddressSchema = new Schema({
   line1: String,
   line2: String,
@@ -9,73 +10,87 @@ const AddressSchema = new Schema({
   state: String,
   pinCode: { type: Number, required: true },
 });
-//Create Schema
-const UserSchema = new Schema({
-  salutation: {
-    type: String,
-    required: true,
-  },
-  firstName: {
-    type: String,
-    required: true,
-  },
-  middleName: {
-    type: String,
-  },
-  lastName: {
-    type: String,
-    required: true,
-  },
-  dob: {
-    type: Date,
-    required: true,
-  },
-  gender: {
-    type: String,
-    //enum: ["Male", "Female"],
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  profilePicURL: {
-    type: String,
-  },
-  mobileNo: {
+
+// Balance Schema
+const BalanceSchema = new Schema({
+  balance: {
     type: Number,
     required: true,
-    unique: true,
+    default: 0,
   },
-  address: {
-    type: AddressSchema,
-    required: true,
-  },
-  createdAt: {
+  credit: {
     type: Number,
     required: true,
+    default: 0,
   },
-  updatedAt: {
+  debit: {
     type: Number,
     required: true,
+    default: 0,
   },
-  accountType: {
-    type: String,
-    required: true,
-    //enum: ["buyer", "merchant"],
-  },
-  //   shopIDList: [
-  //     {
-  //       type: mongoose.Schema.Types.ObjectId,
-  //       reference: "Shop",
-  //     },
-  //   ],
 });
+
+//Create Schema
+const UserSchema = new Schema(
+  {
+    salutation: {
+      type: String,
+      required: true,
+    },
+    firstName: {
+      type: String,
+      required: true,
+    },
+    middleName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
+    dob: {
+      type: Date,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female"],
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      sparse: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    profilePicURL: {
+      type: String,
+    },
+    mobileNo: {
+      type: Number,
+      required: true,
+      unique: true,
+    },
+    address: {
+      type: AddressSchema,
+      required: true,
+    },
+    accountType: {
+      type: String,
+      required: true,
+      enum: ["buyer", "merchant"],
+    },
+    balance: {
+      type: BalanceSchema,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
 //hash the password
 UserSchema.pre("save", async function (next) {
@@ -85,6 +100,8 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-module.exports.User = User = mongoose.model("user", UserSchema);
-module.exports.AddressSchema = AddressSchema;
-module.exports.UserSchema = UserSchema;
+module.exports = {
+  AddressSchema,
+  BalanceSchema,
+  UserSchema,
+};
