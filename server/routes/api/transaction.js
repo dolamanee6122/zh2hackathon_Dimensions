@@ -191,4 +191,14 @@ router.get("/:id", (req, res) => {
   });
 });
 
+router.get("/getTrans/:id/", (req, res) => {
+  const { id } = req.params;
+  Transaction.find({ $or: [{ buyerID: id }, { shopID: id }] })
+    .then((transactions) => {
+      res.json({ transactions });
+    })
+    .catch((err) => {
+      res.status(404).json({ error: err });
+    });
+});
 module.exports = router;

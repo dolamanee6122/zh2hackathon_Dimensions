@@ -12,19 +12,24 @@ const getInitialBalance = () => {
 
 router.post("/", async (req, res) => {
   const { shopName, merchantID, address, rating } = req.body;
-  try {
-    const shop = new Shop({
-      shopName,
-      merchantID,
-      address,
-      rating,
-      balance: getInitialBalance(),
-    });
-    await shop.save();
-    res.json({ message: "Shop Added", shop });
-  } catch (err) {
-    console.log(err);
-  }
+  Merchant.findById(merchantID, async (err, merchant) => {
+    if (err) return console.log(`err`, err);
+    try {
+      const shop = new Shop({
+        shopName,
+        merchantID,
+        address,
+        rating,
+        balance: getInitialBalance(),
+      });
+      await shop.save();
+      merchant.shopIDList.push(shop._id);
+      await merchant.save();
+      res.json({ message: "Shop Added", shop });
+    } catch (err) {
+      console.log(err);
+    }
+  });
 });
 
 // @route   POST /api/shop/addBuyer
@@ -43,6 +48,17 @@ router.post("/addBuyer", async (req, res) => {
     });
     await shop.save();
     res.json({ message: "buyer added in the shop", shop });
+  });
+});
+
+// @route   GET /api/shop/{shopID}
+// @desc    get information of a particular shop
+// @access  Protected
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  Shop.findById(id, (err, shop) => {
+    if (err) return console.log(`err`, err);
+    res.json({ message: "OK", shop });
   });
 });
 
