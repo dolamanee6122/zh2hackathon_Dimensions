@@ -1,6 +1,8 @@
 const Joi = require("joi");
 const express = require("express");
+const UserSchema = require("../../models/User");
 const Merchant = require("../../models/Merchant");
+const mongoose = require("mongoose");
 const router = express.Router();
 
 //Merchant model
@@ -11,6 +13,14 @@ const merchants = [
   { id: 3, name: "merchant3" },
   { id: 4, name: "merchant4" },
 ];
+
+const getInitialBalance = () => {
+  return {
+    balance: 0,
+    credit: 0,
+    debit: 0,
+  };
+};
 
 router.get("/", (req, res) => {
   res.send(merchants);
@@ -27,21 +37,13 @@ router.get("/:id", (req, res) => {
 // @desc    register a new merchants
 // @access  Public
 router.post("/", async (req, res) => {
-  // const { error } = validateMerchant(req.body);
-  // if (error) return res.status(400).send(error.details[0].message);
-  // const merchant = {
-  //   id: merchants.length + 1,
-  //   name: req.body.name,
-  // };
-  // merchants.push(merchant);
-  // res.send(merchant);
-
   const { user } = req.body;
-  console.log(user);
+  user.balance = getInitialBalance();
   try {
     const merchant = new Merchant({ user });
+    console.log(`merchant`, merchant);
     await merchant.save();
-    res.json({ message: "Merchant Added" });
+    res.json({ message: "Merchant Added", merchant });
   } catch (err) {
     console.log(err);
   }

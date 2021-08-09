@@ -2,13 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 //Buyers model
-//const Buyer = require("../../models/Buyer");
-const merchants = [
-  { id: 1, name: "buyer1" },
-  { id: 2, name: "buyer2" },
-  { id: 3, name: "buyer3" },
-  { id: 4, name: "buyer4" },
-];
+const Buyer = require("../../models/Buyer");
+
+const getInitialBalance = () => {
+  return {
+    balance: 0,
+    credit: 0,
+    debit: 0,
+  };
+};
 
 router.get("/", (req, res) => {
   res.send(buyers);
@@ -26,13 +28,37 @@ router.get("/:id", (req, res) => {
 // @route   POST /api/buyers
 // @desc    register a new buyer
 // @access  Public
-router.post("/", (req, res) => {
-  const buyer = {
-    id: buyers.length + 1,
-    name: req.body.name,
-  };
-  buyers.push(buyer);
-  res.send(buyer);
+router.post("/", async (req, res) => {
+  const { user } = req.body;
+  user.balance = getInitialBalance();
+  try {
+    const buyer = new Buyer({ user });
+    //console.log(`buyer`, buyer);
+    await buyer.save();
+    res.json({ message: "Buyer Added", buyer });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+// @route   POST /api/buyers/addShop
+// @desc    Add a new shop for buyer
+// @access  Protected
+router.post("/addShop", async (req, res) => {
+  const { buyerID, shopID, shopName } = req.body;
+  Buyer.findById(buyerID, async (err, buyer) => {
+    if (err) return console.log(`err`, err);
+
+    //TODO check if the shop is already added for the buyer
+
+    buyer.balanceShopWise.push({
+      shopID,
+      shopName,
+      balance: getInitialBalance(),
+    });
+    await buyer.save();
+    res.json({ message: "shop added for the buyer", buyer });
+  });
 });
 
 module.exports = router;

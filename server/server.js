@@ -24,7 +24,7 @@ app.use("/api/shop", require("./routes/api/shop"));
 //app.use("/", require("./routes/auth"));
 app.use("/api/login", require("./routes/api/login"));
 app.use("/api/merchants", require("./routes/api/merchants"));
-//app.use("/api/buyers", require("./routes/api/users"));
+app.use("/api/buyers", require("./routes/api/buyers"));
 app.use("/api/transaction", require("./routes/api/transaction"));
 
 //serve static asset if in production
