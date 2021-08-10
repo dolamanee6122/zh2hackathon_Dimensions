@@ -1,18 +1,11 @@
 const Joi = require("joi");
 const express = require("express");
-const UserSchema = require("../../models/User");
+const { UserSchema } = require("../../models/User");
 const Merchant = require("../../models/Merchant");
+const Shop = require("../../models/Shop");
+
 const mongoose = require("mongoose");
 const router = express.Router();
-
-//Merchant model
-//const Merchant = require("../../models/Merchant");
-const merchants = [
-  { id: 1, name: "merchant1" },
-  { id: 2, name: "merchant2" },
-  { id: 3, name: "merchant3" },
-  { id: 4, name: "merchant4" },
-];
 
 const getInitialBalance = () => {
   return {
@@ -22,15 +15,15 @@ const getInitialBalance = () => {
   };
 };
 
-router.get("/", (req, res) => {
-  res.send(merchants);
-});
-
-router.get("/:id", (req, res) => {
-  const merchant = merchants.find((m) => m.id === parseInt(req.params.id));
-  if (!merchant)
-    return res.status(404).send("Given merchant ID does not exist");
-  res.send(merchant);
+// @route   GET /api/merchants/{merchantID}
+// @desc    get information of a particular merchant
+// @access  Protected
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  Merchant.findById(id, (err, merchant) => {
+    if (err) return console.log(`err`, err);
+    res.json({ message: "OK", merchant });
+  });
 });
 
 // @route   POST /api/merchants
@@ -47,6 +40,23 @@ router.post("/", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
+});
+
+// @route   POST /api/merchants/addShop
+// @desc    add a new shop for merchant
+// @access  Protected
+router.post("/addShop", async (req, res) => {
+  const { merchantID, shopID } = req.body;
+  Merchant.findById(merchantID, async (err, merchant) => {
+    if (err) return console.log(`err`, err);
+    Shop.findById(shopID, async (err, shop) => {
+      if (err) return console.log(`err`, err);
+      merchant.shopIDList.push(shopID);
+      console.log(`merchant`, merchant);
+      await merchant.save();
+      res.json({ message: "Shop Added for Merchant", merchant });
+    });
+  });
 });
 
 router.put("/:id", (req, res) => {

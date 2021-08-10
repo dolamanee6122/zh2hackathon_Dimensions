@@ -50,7 +50,6 @@ router.post("/addShop", async (req, res) => {
     if (err) return console.log(`err`, err);
 
     //TODO check if the shop is already added for the buyer
-
     buyer.balanceShopWise.push({
       shopID,
       shopName,

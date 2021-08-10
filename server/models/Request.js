@@ -41,6 +41,7 @@ const RequestSchema = new Schema({
     type: String,
     required: true,
   },
+  remarks: String,
   balanceShopWise: BalanceSchema,
 });
 
