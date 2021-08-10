@@ -22,7 +22,7 @@ import Requests from "./Requests";
 import RecentTransactions from "./RecentTransactions";
 import { mainListItems, secondaryListItems } from "../listItems";
 import BASE_URL from "../../baseURL";
-import axios from "axios";
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -128,23 +128,34 @@ export default function Dashboard() {
   const requests = clsx(classes.paper, classes.requests);
 
   const [merchantInfo,setMerchantInfo]=useState();
+  const [loading,setLoading] =useState(true);
 
   const id="61116b71f91ae38348c87a2d";
   const apiURL=BASE_URL+"merchants/"+id;
   
-  async function fetchMerchant() {
-    const response = await fetch(apiURL);
-    const data = await response.json();
-    setMerchantInfo(data.merchant);
+  console.log(apiURL);
+  async function fetchMerchant(){
+    console.log("here");
+    const response = await fetch(`${apiURL}`);
+    const info = await response.json();
+    setMerchantInfo(info.merchant);
+    setLoading(false);
+    console.log("movies",merchantInfo);
   }
   useEffect(()=>{
+    console.log("useEffece t Caked");
     fetchMerchant();
+    
   },[]);
+  
 
   return (
-    <div className={classes.root}>
+    <div>
+   {loading && <h1>lOaDiNg...</h1>}
+   {!loading && <div className={classes.root}>
       <CssBaseline />
       {console.log("mmmmmmmmmmmmmm",merchantInfo)}
+      {console.log('ppp')}
       <AppBar
         position="absolute"
         className={clsx(classes.appBar, open && classes.appBarShift)}
@@ -204,6 +215,7 @@ export default function Dashboard() {
               <Paper className={fixedHeightPaper}>
                 <StatCards
                   title={"Today"}
+                  balance={"appl"}
                   balance={merchantInfo.user.balance}
                   lastUpdated={"53 mins ago"}
                 />
@@ -214,7 +226,7 @@ export default function Dashboard() {
               <Paper className={fixedHeightPaper}>
                 <StatCards
                   style={{ color: "yellow" }}
-                  title={"This Week"}
+                  title={"Thismerchant"}
                   balance={merchantInfo.user.balance}
                   lastUpdated={"7-15 August 2021"}
                 />
@@ -225,6 +237,7 @@ export default function Dashboard() {
               <Paper className={fixedHeightPaper}>
                 <StatCards
                   title={"This Month"}
+                  balance={"1400"}
                   balance={merchantInfo.user.balance}
                   lastUpdated={"21 August 2021"}
                 />
@@ -235,6 +248,7 @@ export default function Dashboard() {
               <Paper className={fixedHeightPaper}>
                 <StatCards
                   title={"All Tieme"}
+                  balance={"1400"}
                   balance={merchantInfo.user.balance}
                   lastUpdated="July-Sept"
                 />
@@ -255,6 +269,7 @@ export default function Dashboard() {
           </Grid>
         </Container>
       </main>
+    </div>}
     </div>
   );
 }
