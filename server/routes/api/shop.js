@@ -10,45 +10,29 @@ const getInitialBalance = () => {
   };
 };
 
+// @route   POST /api/shop/
+// @desc    Add a new shop under a merchant
+// @access  Protected
 router.post("/", async (req, res) => {
   const { shopName, merchantID, address, rating } = req.body;
-  Merchant.findById(merchantID, async (err, merchant) => {
-    if (err) return console.log(`err`, err);
-    try {
-      const shop = new Shop({
-        shopName,
-        merchantID,
-        address,
-        rating,
-        balance: getInitialBalance(),
-      });
-      await shop.save();
-      merchant.shopIDList.push(shop._id);
-      await merchant.save();
-      res.json({ message: "Shop Added", shop });
-    } catch (err) {
-      console.log(err);
-    }
-  });
-});
-
-// @route   POST /api/shop/addBuyer
-// @desc    Add a new buyer for shop
-// @access  Protected
-router.post("/addBuyer", async (req, res) => {
-  const { shopID, buyerID, buyerName } = req.body;
-  Shop.findById(shopID, async (err, shop) => {
-    if (err) return console.log(`err`, err);
-
-    //TODO check if the user is already present in the shop
-    shop.balanceUserWise.push({
-      buyerID,
-      buyerName,
+  try {
+    const merchant = await Merchant.findById(merchantID);
+    if (!merchant) return res.status(404).json({ message: "Invalid merchant" });
+    const shop = new Shop({
+      shopName,
+      merchantID,
+      address,
+      rating,
       balance: getInitialBalance(),
     });
+    merchant.shopList.push({ shopID: shop._id, shopName: shop.shopName });
     await shop.save();
-    res.json({ message: "buyer added in the shop", shop });
-  });
+    await merchant.save();
+    res.json({ message: "Shop Added", shop, merchant });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
 });
 
 // @route   GET /api/shop/{shopID}
@@ -56,11 +40,16 @@ router.post("/addBuyer", async (req, res) => {
 // @access  Protected
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
-  Shop.findById(id, (err, shop) => {
-    if (err) return console.log(`err`, err);
+  try {
+    const shop = Shop.findById(id);
+    if (!shop) return res.status(404).json({ message: "Invalid ShopID" });
     res.json({ message: "OK", shop });
-  });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
 });
 
+//TODO
 router.post("/addRequest", async (req, res) => {});
 module.exports = router;

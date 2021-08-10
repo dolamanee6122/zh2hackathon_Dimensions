@@ -29,76 +29,84 @@ const addBuyerToShop = (shop, buyer) => {
     balance: getInitialBalance(),
   });
 };
+
+// @route   POST /api/request/
+// @desc    create a request for doing a transaction
+// @access  Protected
 router.post("/", async (req, res) => {
   const { shopID, buyerID, amount, recordType, paymentMode } = req.body;
 
-  Buyer.findById(buyerID, async (err, buyer) => {
-    if (err) return res.json({ status: "failed" });
+  try {
+    const buyer = await Buyer.findById(buyerID);
+    const shop = await Shop.findById(shopID);
+    if (!buyer || !shop)
+      return res.status(404).json({ message: "Invalid request" });
     const { firstName, lastName, rating, address } = buyer.user;
-    Shop.findById(shopID, async (err, shop) => {
-      if (err) return res.json({ error: err });
-      const { shopName } = shop;
-      const buyerName = firstName + " " + lastName;
-      let balanceShopWise = shop.balanceUserWise.find(
-        (e) => JSON.stringify(e.buyerID) === JSON.stringify(buyerID)
-      );
+    const { shopName } = shop;
+    const buyerName = firstName + " " + lastName;
+    let balanceShopWise = shop.balanceUserWise.find(
+      (e) => JSON.stringify(e.buyerID) === JSON.stringify(buyerID)
+    );
 
-      // TODO Add connection explicity if no connection
-      if (!balanceShopWise) {
-        addShopToBuyer(shop, buyer);
-        addBuyerToShop(shop, buyer);
-        await shop.save();
-        await buyer.save();
-        balanceShopWise = {
-          shopID: shop._id,
-          shopName: shop.shopName,
-          balance: getInitialBalance(),
-        };
-      }
-      const request = new Request({
-        buyer: {
-          buyerID,
-          buyerName,
-          rating,
-          address,
-        },
-        shop: {
-          shopID,
-          shopName,
-        },
-        status: "PENDING",
-        amount,
-        recordType,
-        paymentMode,
-        balanceShopWise: balanceShopWise.balance,
-      });
-      //console.log(`request`, request);
-      //res.json({ status: "OK", request });
-      try {
-        await request.save();
-        res.json({ status: "OK", request });
-      } catch (err) {
-        console.log(`err`, err);
-      }
+    // TODO Add connection explicity if no connection
+    if (!balanceShopWise) {
+      addShopToBuyer(shop, buyer);
+      addBuyerToShop(shop, buyer);
+      balanceShopWise = {
+        shopID: shop._id,
+        shopName: shop.shopName,
+        balance: getInitialBalance(),
+      };
+      await shop.save();
+      await buyer.save();
+    }
+
+    const request = new Request({
+      buyer: {
+        buyerID,
+        buyerName,
+        rating,
+        address,
+      },
+      shop: {
+        shopID,
+        shopName,
+      },
+      status: "PENDING",
+      amount,
+      recordType,
+      paymentMode,
+      balanceShopWise: balanceShopWise.balance,
     });
-  });
+
+    await request.save();
+    res.json({ status: "OK", request });
+  } catch (err) {
+    console.log(`err`, err);
+    return res.status(500).json({ err });
+  }
 });
 
+// @route   POST /api/request/reject
+// @desc    Rejecting a pending transaction request
+// @access  Protected
 router.post("/reject", async (req, res) => {
   const { requestID, remarks } = req.body;
-
-  Request.findById(requestID, async (err, request) => {
-    if (err) return res.json({ status: "failed" });
-
+  try {
+    const request = await Request.findById(requestID);
+    if (!request) return res.status(404).json({ message: "Invalid requestID" });
+    if (request.status !== "PENDING")
+      return res.json({ message: "Not a pending request" });
     request.status = "REJECTED";
     if (remarks) request.remarks = remarks;
-    try {
-      await request.save();
-      res.json({ status: "OK", request });
-    } catch (err) {
-      console.log(`err`, err);
-    }
-  });
+    else request.remarks = "None";
+
+    await request.save();
+    res.json({ status: "OK", request });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
 });
 
 module.exports = router;

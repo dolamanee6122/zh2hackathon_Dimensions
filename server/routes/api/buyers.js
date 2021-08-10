@@ -12,19 +12,6 @@ const getInitialBalance = () => {
   };
 };
 
-router.get("/", (req, res) => {
-  res.send(buyers);
-});
-
-router.get("/:id", (req, res) => {
-  const buyer = buyers.find((b) => b.id === parseInt(req.params.id));
-  if (!buyer) {
-    res.status(404).send("Given buyer ID does not exist");
-  } else {
-    res.send(buyer);
-  }
-});
-
 // @route   POST /api/buyers
 // @desc    register a new buyer
 // @access  Public
@@ -33,31 +20,26 @@ router.post("/", async (req, res) => {
   user.balance = getInitialBalance();
   try {
     const buyer = new Buyer({ user });
-    //console.log(`buyer`, buyer);
     await buyer.save();
     res.json({ message: "Buyer Added", buyer });
   } catch (err) {
     console.log(err);
+    res.status(500).json({ err });
   }
 });
 
-// @route   POST /api/buyers/addShop
-// @desc    Add a new shop for buyer
+// @route   GET /api/buyers/{buyerID}
+// @desc    get information of a particular buyer
 // @access  Protected
-router.post("/addShop", async (req, res) => {
-  const { buyerID, shopID, shopName } = req.body;
-  Buyer.findById(buyerID, async (err, buyer) => {
-    if (err) return console.log(`err`, err);
-
-    //TODO check if the shop is already added for the buyer
-    buyer.balanceShopWise.push({
-      shopID,
-      shopName,
-      balance: getInitialBalance(),
-    });
-    await buyer.save();
-    res.json({ message: "shop added for the buyer", buyer });
-  });
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const buyer = await Buyer.findById(id);
+    if (!buyer) return res.status(404).json({ message: "Invalid buyerID" });
+    res.json({ message: "OK", buyer });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
 });
-
 module.exports = router;
