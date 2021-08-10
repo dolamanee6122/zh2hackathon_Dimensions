@@ -10,10 +10,13 @@ const MerchantSchema = new Schema(
       type: UserSchema,
       required: true,
     },
-    shopIDList: [
+    shopList: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "shop",
+        shopID: {
+          type: Schema.Types.ObjectId,
+          ref: "shop",
+        },
+        shopName: String,
       },
     ],
     //TODO: Add Last5 Transaction

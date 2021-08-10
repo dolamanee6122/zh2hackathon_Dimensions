@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const bcrypt = require("bcryptjs");
 const express = require("express");
 const router = express.Router();
 const Merchant = require("../../models/Merchant");
@@ -39,6 +40,21 @@ router.get("/:id", async (req, res) => {
     if (!merchant)
       return res.status(404).json({ message: "Invalid merchantID" });
     res.json({ message: "OK", merchant });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
+});
+
+// @route   POST /api/merchants/signin
+// @desc    login for merchant
+// @access  Protected
+router.post("/signin", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const merchantLogin = await Merchant.findOne({ email });
+    if (!merchantLogin || !bcrypt.compare(password, merchantLogin.pass))
+      return res.status(404).json({ message: "Invalid credentials" });
   } catch (err) {
     console.log(`err`, err);
     res.status(500).json({ err });

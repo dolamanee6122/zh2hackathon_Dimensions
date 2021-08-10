@@ -25,7 +25,7 @@ router.post("/", async (req, res) => {
       rating,
       balance: getInitialBalance(),
     });
-    merchant.shopIDList.push(shop._id);
+    merchant.shopList.push({ shopID: shop._id, shopName: shop.shopName });
     await shop.save();
     await merchant.save();
     res.json({ message: "Shop Added", shop, merchant });
