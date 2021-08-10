@@ -8,6 +8,7 @@ app.use(express.json());
 
 //DB config
 const db = require("./config/keys").mongoURI;
+console.log('db',db);
 
 //connect to mongo
 mongoose
