@@ -130,7 +130,7 @@ export default function Dashboard() {
   const [merchantInfo,setMerchantInfo]=useState();
   const [loading,setLoading] =useState(true);
 
-  const id="61116b71f91ae38348c87a2d";
+  const id="6112316ca49bb59034d70b79";
   const apiURL=BASE_URL+"merchants/"+id;
   
   console.log(apiURL);
@@ -154,7 +154,7 @@ export default function Dashboard() {
    {loading && <h1>lOaDiNg...</h1>}
    {!loading && <div className={classes.root}>
       <CssBaseline />
-      {console.log("mmmmmmmmmmmmmm",merchantInfo)}
+      {console.log("mmmmmmmmmmmmmm",merchantInfo,merchantInfo.shopList)}
       {console.log('ppp')}
       <AppBar
         position="absolute"

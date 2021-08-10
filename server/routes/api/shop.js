@@ -21,6 +21,7 @@ router.post("/", async (req, res) => {
     const shop = new Shop({
       shopName,
       merchantID,
+      merchantName:merchant.user.firstName+" "+merchant.user.lastName,
       address,
       rating,
       balance: getInitialBalance(),

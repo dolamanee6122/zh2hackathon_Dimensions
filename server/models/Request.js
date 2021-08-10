@@ -23,6 +23,16 @@ const RequestSchema = new Schema({
     },
     shopName: String,
   },
+  merchant:{
+    merchantID: {
+      type: Schema.Types.ObjectId,
+      ref: "merchant",
+      required: true,
+    },
+    merchantName: String,
+    rating: Number,
+    address: String,
+  },
   status: {
     type: String,
     enum: ["PENDING", "APPROVED", "REJECTED", "FAILED"],

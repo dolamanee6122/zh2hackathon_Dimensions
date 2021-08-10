@@ -180,6 +180,7 @@ router.post("/", async (req, res) => {
 // @access  Protected
 router.get("/id/:id", async (req, res) => {
   const { id } = req.params;
+  
   //TODO define and implement who have access to transaction
   try {
     const transaction = await Transaction.findById(id);
@@ -195,12 +196,15 @@ router.get("/id/:id", async (req, res) => {
 // @route   GET /api/transaction/{buyerID | shopID | merchantID}
 // @desc    Get all transaction details for merchant, shop or buyer
 // @access  Protected
-router.get("/:id/", async (req, res) => {
+router.get("/:id/", async (req, res) => {   
   const { id } = req.params;
+ 
+  const{limit}=req.query;
+ 
   try {
     const transactions = await Transaction.find({
       $or: [{ buyerID: id }, { shopID: id }, { merchantID: id }],
-    });
+    }).sort({_id:-1}).limit(parseInt(limit));
     if (!transactions)
       return res.status(404).json({ message: "No transaction found" });
     res.json({ message: "OK", transactions });

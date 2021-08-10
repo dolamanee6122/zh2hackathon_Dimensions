@@ -41,6 +41,8 @@ router.post("/", async (req, res) => {
     const shop = await Shop.findById(shopID);
     if (!buyer || !shop)
       return res.status(404).json({ message: "Invalid request" });
+    const {merchantID,merchantName}=shop;
+    const merchant =Merchant.findById(merchantID);
     const { firstName, lastName, rating, address } = buyer.user;
     const { shopName } = shop;
     const buyerName = firstName + " " + lastName;
@@ -71,6 +73,10 @@ router.post("/", async (req, res) => {
       shop: {
         shopID,
         shopName,
+      },
+      merchant:{
+        merchantID,
+        merchantName,
       },
       status: "PENDING",
       amount,
@@ -103,6 +109,29 @@ router.post("/reject", async (req, res) => {
 
     await request.save();
     res.json({ status: "OK", request });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
+});
+
+
+// @route   GET /api/request/{buyerID | shopID | merchantID}
+// @desc    Get all Request details for merchant, shop or buyer
+// @access  Protected
+
+router.get("/:id/", async (req, res) => {   
+  const { id } = req.params;
+ 
+  const{limit}=req.query;
+ 
+  try {
+    const requests = await Request.find({
+      $or: [{ "buyer.buyerID": id }, {"shop.shopID": id },{"merchant.merchantID": id }],
+    }).sort({_id:-1}).limit(parseInt(limit));
+    if (!requests)
+      return res.status(404).json({ message: "No Requests found" });
+    res.json({ message: "OK", requests });
   } catch (err) {
     console.log(`err`, err);
     res.status(500).json({ err });
