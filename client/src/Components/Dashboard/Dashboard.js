@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -21,7 +21,8 @@ import StatCards from "./StatCards";
 import Requests from "./Requests";
 import RecentTransactions from "./RecentTransactions";
 import { mainListItems, secondaryListItems } from "../listItems";
-
+import BASE_URL from "../../baseURL";
+import axios from "axios";
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -126,9 +127,24 @@ export default function Dashboard() {
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   const requests = clsx(classes.paper, classes.requests);
 
+  const [merchantInfo,setMerchantInfo]=useState();
+
+  const id="61116b71f91ae38348c87a2d";
+  const apiURL=BASE_URL+"merchants/"+id;
+  
+  async function fetchMerchant() {
+    const response = await fetch(apiURL);
+    const data = await response.json();
+    setMerchantInfo(data.merchant);
+  }
+  useEffect(()=>{
+    fetchMerchant();
+  },[]);
+
   return (
     <div className={classes.root}>
       <CssBaseline />
+      {console.log("mmmmmmmmmmmmmm",merchantInfo)}
       <AppBar
         position="absolute"
         className={clsx(classes.appBar, open && classes.appBarShift)}
@@ -188,7 +204,7 @@ export default function Dashboard() {
               <Paper className={fixedHeightPaper}>
                 <StatCards
                   title={"Today"}
-                  value={"-5600"}
+                  balance={merchantInfo.user.balance}
                   lastUpdated={"53 mins ago"}
                 />
               </Paper>
@@ -199,7 +215,7 @@ export default function Dashboard() {
                 <StatCards
                   style={{ color: "yellow" }}
                   title={"This Week"}
-                  value={"7688"}
+                  balance={merchantInfo.user.balance}
                   lastUpdated={"7-15 August 2021"}
                 />
               </Paper>
@@ -209,7 +225,7 @@ export default function Dashboard() {
               <Paper className={fixedHeightPaper}>
                 <StatCards
                   title={"This Month"}
-                  value={"15000"}
+                  balance={merchantInfo.user.balance}
                   lastUpdated={"21 August 2021"}
                 />
               </Paper>
@@ -218,8 +234,8 @@ export default function Dashboard() {
             <Grid item xs={12} md={6} lg={3}>
               <Paper className={fixedHeightPaper}>
                 <StatCards
-                  title={"This Quarter"}
-                  value={"95030"}
+                  title={"All Tieme"}
+                  balance={merchantInfo.user.balance}
                   lastUpdated="July-Sept"
                 />
               </Paper>

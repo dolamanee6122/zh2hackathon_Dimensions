@@ -20,7 +20,7 @@ const useStyles = makeStyles({
     fontWeight: 600
   }
 });
-export default function StatCards({ title, value, lastUpdated }) {
+export default function StatCards({ title, balance, lastUpdated }) {
   const classes = useStyles();
   return (
     <div className={classes.statcard}>
@@ -30,17 +30,17 @@ export default function StatCards({ title, value, lastUpdated }) {
       </div>
       <hr />
       <div className={classes.totalValue}>
-        ₹ {Math.abs(value)}({value > 0 ? "+" : "-"})
+        ₹ {Math.abs(balance.balance)}({balance.balance > 0 ? "+" : "-"})
       </div>
       <br />
       <div style={{ display: "flex", fontSize: "18px" }}>
         <div>
           Credit
-          <div className={classes.valueGreen}>(+)9500</div>
+          <div className={classes.valueGreen}>{balance.credit}</div>
         </div>
         <div style={{ marginLeft: "auto", marginRight: "48px" }}>
           Debit
-          <div className={classes.valueRed}>(-)12000</div>
+          <div className={classes.valueRed}>{balance.debit}</div>
         </div>
       </div>
       <br />
