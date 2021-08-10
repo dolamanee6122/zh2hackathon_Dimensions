@@ -4,7 +4,7 @@ const Transaction = require("../../models/Transaction");
 const Merchant = require("../../models/Merchant");
 const Shop = require("../../models/Shop");
 const Buyer = require("../../models/Buyer");
-//const Request = require("../../models/Buyer");
+const Request = require("../../models/Request");
 
 // update balance of buyer for the current transaction
 const updateBalanceBuyer = (buyer, shopID, transaction, recordType, amount) => {
@@ -102,13 +102,19 @@ const updateBalance = (
   updateBalanceMerchant(merchant, recordType, amount);
 };
 
+// @route   POST /api/transaction/
+// @desc    do a new transaction with requestID
+// @access  Protected
 router.post("/", async (req, res) => {
   //console.log(req.body);
   const { requestID, attributes } = req.body;
 
-  Request.findById(requestID, (err, request) => {
-    if (err) return console.log(err);
-    //console.log(`request`, request);
+  try {
+    const request = await Request.findById(requestID);
+    if (!request) return res.status(404).json({ message: "Invalid request" });
+
+    if (request.status !== "PENDING")
+      return res.json({ message: "Transaction already done" });
     const {
       buyer: { buyerID },
       shop: { shopID },
@@ -117,88 +123,90 @@ router.post("/", async (req, res) => {
       recordType,
     } = request;
     currency = "INR";
-    // const trxnRequest = {
-    //   buyerID: request.buyer.buyerID,
-    //   shopID: request.shop.shopID,
-    //   amount: request.amount,
-    //   paymentMode: request.paymentMode,
-    //   recordType: request.recordType,
-    //   currency: "INR",
-    //   attributes,
-    // };
 
-    try {
-      const transaction = new Transaction({
-        buyerID,
-        shopID,
-        amount,
-        paymentMode,
-        recordType,
-        currency,
-        attributes,
-      });
+    const buyer = await Buyer.findById(buyerID);
+    const shop = await Shop.findById(shopID);
 
-      //TODO handle case when buyerID, shopID, merchantID not found
-      //TODO check if the request has been already approved or failed
-      Buyer.findById(request.buyer.buyerID, async (err, buyer) => {
-        if (err) return console.log(err);
-        Shop.findById(request.shop.shopID, async (err, shop) => {
-          if (err) return console.log(err);
-          const merchantID = shop.merchantID;
-          Merchant.findById(merchantID, async (err, merchant) => {
-            if (err) return console.log(err);
-            //console.log(merchant);
-
-            updateBalance(
-              buyer,
-              shop,
-              merchant,
-              transaction,
-              recordType,
-              amount,
-              currency
-            );
-            await buyer.save();
-            await shop.save();
-            await merchant.save();
-            await transaction.save();
-
-            request.status = "APPROVED";
-            await request.save();
-            //console.log(`request`, request);
-            return res.json({
-              status: "Payment Successful...",
-              buyer,
-              shop,
-              merchant,
-              transaction,
-              request,
-            });
-          });
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  });
-});
-
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
-  Transaction.findById(id, (err, transaction) => {
-    if (err) return res.status(404).json({ error: err });
-    res.json({ message: "OK", transaction });
-  });
-});
-
-router.get("/getTrans/:id/", (req, res) => {
-  const { id } = req.params;
-  Transaction.find({ $or: [{ buyerID: id }, { shopID: id }] })
-    .then((transactions) => {
-      res.json({ transactions });
-    })
-    .catch((err) => {
-      res.status(404).json({ error: err });
+    if (!buyer || !shop)
+      return res.status(404).json({ message: "Invalid request" });
+    const { merchantID } = shop;
+    const merchant = await Merchant.findById(merchantID);
+    if (!merchant) return res.status(404).json({ message: "Invalid request" });
+    const transaction = new Transaction({
+      buyerID,
+      shopID,
+      merchantID,
+      amount,
+      paymentMode,
+      recordType,
+      currency,
+      attributes,
     });
+
+    updateBalance(
+      buyer,
+      shop,
+      merchant,
+      transaction,
+      recordType,
+      amount,
+      currency
+    );
+
+    request.status = "APPROVED";
+    await request.save();
+    await buyer.save();
+    await shop.save();
+    await merchant.save();
+    await transaction.save();
+
+    //TODO update the rating of buyer/shop/merchant if required
+    return res.json({
+      status: "Payment Successful...",
+      buyer,
+      shop,
+      merchant,
+      transaction,
+      request,
+    });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
+});
+
+// @route   GET /api/transaction/id/{transactionID}
+// @desc    Get information for a transactionID
+// @access  Protected
+router.get("/id/:id", async (req, res) => {
+  const { id } = req.params;
+  //TODO define and implement who have access to transaction
+  try {
+    const transaction = await Transaction.findById(id);
+    if (!transaction)
+      return res.status(404).json({ message: "Invalid Transaction ID" });
+    res.json({ message: "OK", transaction });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
+});
+
+// @route   GET /api/transaction/{buyerID | shopID | merchantID}
+// @desc    Get all transaction details for merchant, shop or buyer
+// @access  Protected
+router.get("/:id/", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const transactions = await Transaction.find({
+      $or: [{ buyerID: id }, { shopID: id }, { merchantID: id }],
+    });
+    if (!transactions)
+      return res.status(404).json({ message: "No transaction found" });
+    res.json({ message: "OK", transactions });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
 });
 module.exports = router;

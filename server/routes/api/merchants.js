@@ -1,11 +1,8 @@
 const Joi = require("joi");
 const express = require("express");
-const { UserSchema } = require("../../models/User");
+const router = express.Router();
 const Merchant = require("../../models/Merchant");
 const Shop = require("../../models/Shop");
-
-const mongoose = require("mongoose");
-const router = express.Router();
 
 const getInitialBalance = () => {
   return {
@@ -15,17 +12,6 @@ const getInitialBalance = () => {
   };
 };
 
-// @route   GET /api/merchants/{merchantID}
-// @desc    get information of a particular merchant
-// @access  Protected
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  Merchant.findById(id, (err, merchant) => {
-    if (err) return console.log(`err`, err);
-    res.json({ message: "OK", merchant });
-  });
-});
-
 // @route   POST /api/merchants
 // @desc    register a new merchants
 // @access  Public
@@ -33,30 +19,30 @@ router.post("/", async (req, res) => {
   const { user } = req.body;
   user.balance = getInitialBalance();
   try {
+    //TODO check if the emailID/mobileNo already exist
     const merchant = new Merchant({ user });
-    console.log(`merchant`, merchant);
     await merchant.save();
     res.json({ message: "Merchant Added", merchant });
   } catch (err) {
-    console.log(err);
+    console.log(`err`, err);
+    res.status(500).json({ err });
   }
 });
 
-// @route   POST /api/merchants/addShop
-// @desc    add a new shop for merchant
+// @route   GET /api/merchants/{merchantID}
+// @desc    get information of a particular merchant
 // @access  Protected
-router.post("/addShop", async (req, res) => {
-  const { merchantID, shopID } = req.body;
-  Merchant.findById(merchantID, async (err, merchant) => {
-    if (err) return console.log(`err`, err);
-    Shop.findById(shopID, async (err, shop) => {
-      if (err) return console.log(`err`, err);
-      merchant.shopIDList.push(shopID);
-      console.log(`merchant`, merchant);
-      await merchant.save();
-      res.json({ message: "Shop Added for Merchant", merchant });
-    });
-  });
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const merchant = await Merchant.findById(id);
+    if (!merchant)
+      return res.status(404).json({ message: "Invalid merchantID" });
+    res.json({ message: "OK", merchant });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
 });
 
 router.put("/:id", (req, res) => {
