@@ -5,9 +5,11 @@ const app = express();
 
 //BodyParser middleware
 app.use(express.json());
-
+var cors = require('cors');
+app.use(cors());
 //DB config
 const db = require("./config/keys").mongoURI;
+console.log('db',db);
 
 //connect to mongo
 mongoose
