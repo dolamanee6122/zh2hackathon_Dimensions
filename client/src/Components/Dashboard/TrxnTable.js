@@ -9,7 +9,6 @@ import {
   import React from "react";
   
   const TrxnTable = ({ rows }) => {
-    console.log("cocn", rows);
     return (
       <div>
         <Table size="small">

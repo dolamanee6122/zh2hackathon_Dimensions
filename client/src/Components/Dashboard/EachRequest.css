@@ -8,18 +8,34 @@
     margin: 2px;
     margin-left: 8px;
   }
-  .req-locality {
+  .req-paymentmode {
     font-size: 12px;
     margin: 2px;
     margin-top: 0px;
     color: gray;
-    margin-left: 8px;
+    margin-left:8px;
   }
-  .req-ratings {
+  .req-balance {
     margin: 2px;
     margin-top: 0px;
     margin-left: 8px;
     font-size: 12px;
     font-weight: 500;
+  }
+  .new{
+    background-color: #0077dd;
+    border-radius: 10%;
+    color:white;
+    font-weight: 600;
+    padding: 3%;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  .green
+  {
+    color:green;
+  }
+  .red{
+    color:#d93737;
   }
   

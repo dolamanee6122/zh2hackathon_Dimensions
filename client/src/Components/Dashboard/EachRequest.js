@@ -3,7 +3,8 @@ import CheckCircleOutlineOutlinedIcon from "@material-ui/icons/CheckCircleOutlin
 import CancelOutlinedIcon from "@material-ui/icons/CancelOutlined";
 import React from "react";
 import "./EachRequest.css";
-const EachRequest = () => {
+const EachRequest = ({data}) => {
+  console.log(`data`, data)
   return (
     <Card>
       <div
@@ -13,11 +14,12 @@ const EachRequest = () => {
           alignItems: "center"
         }}
       >
-        <Avatar>hj</Avatar>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div className="req-name">Gaadi Wala</div>
-          <div className="req-locality">Ludhiana, Punjab</div>
-          <div className="req-ratings">4.6 Jholas</div>
+        <Avatar>{data.buyer.buyerName.toUpperCase()[0]}</Avatar>
+        <div style={{ display: "flex", flexDirection: "column" ,alignItems:"flex-start" }}>
+          <div className="req-name">{data.buyer.buyerName}</div>
+          <div className="req-paymentmode">{data.paymentMode.toUpperCase()}</div>
+          { data.balanceShopWise.debit===0 && data.balanceShopWise.credit===0 && <div className="new">NEW!</div>}
+          { (data.balanceShopWise.credit!==0 || data.balanceShopWise.debit !==0) && <div className="req-balance">{data.balanceShopWise.balance}</div>}
         </div>
         <div
           style={{
@@ -26,9 +28,11 @@ const EachRequest = () => {
             flexDirection: "column"
           }}
         >
-          <div style={{ fontWeight: "600" }}>-500</div>
-          <div style={{ color: "#d93737" }}>+230</div>
+          <div style={{ fontWeight: "600", fontSize:"22px" }}>{data.amount}</div>
+          <div className={data.recordType==="CREDIT"?"red":"green"}>{data.recordType}</div>
+          {/* <div style={{ color: "#d93737" }}>+230</div> */}
         </div>
+        {data.status==="PENDING" &&
         <div>
           <IconButton>
             <CheckCircleOutlineOutlinedIcon style={{ color: "green" }} />
@@ -36,7 +40,12 @@ const EachRequest = () => {
           <IconButton>
             <CancelOutlinedIcon style={{ color: "#d93737" }} />
           </IconButton>
-        </div>
+        </div>}
+        {data.status!=="PENDING" &&
+        <div>
+          <p style={{fontWeight:"600", marginLeft:"24px"}} className={data.status==="APPROVED"?"green":"red"} >{data.status}</p>
+        </div>}
+        
       </div>
     </Card>
   );
