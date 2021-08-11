@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
+const moment = require("moment");
 const Transaction = require("../../models/Transaction");
 const Merchant = require("../../models/Merchant");
 const Shop = require("../../models/Shop");
@@ -180,7 +182,7 @@ router.post("/", async (req, res) => {
 // @access  Protected
 router.get("/id/:id", async (req, res) => {
   const { id } = req.params;
-  
+
   //TODO define and implement who have access to transaction
   try {
     const transaction = await Transaction.findById(id);
@@ -196,21 +198,112 @@ router.get("/id/:id", async (req, res) => {
 // @route   GET /api/transaction/{buyerID | shopID | merchantID}
 // @desc    Get all transaction details for merchant, shop or buyer
 // @access  Protected
-router.get("/:id/", async (req, res) => {   
+router.get("/:id/", async (req, res) => {
   const { id } = req.params;
- 
-  const{limit}=req.query;
- 
+
+  const { limit } = req.query;
+
   try {
     const transactions = await Transaction.find({
       $or: [{ buyerID: id }, { shopID: id }, { merchantID: id }],
-    }).sort({_id:-1}).limit(parseInt(limit));
+    })
+      .sort({ _id: -1 })
+      .limit(parseInt(limit));
     if (!transactions)
       return res.status(404).json({ message: "No transaction found" });
     res.json({ message: "OK", transactions });
   } catch (err) {
     console.log(`err`, err);
     res.status(500).json({ err });
+  }
+});
+
+// returns the balance of entity from beginning
+const getAllTimeBalance = async (id, type) => {
+  let allTime;
+  if (type == "merchant") {
+    allTime = await Merchant.findById(id).select("user.balance");
+    allTime = allTime.user.balance;
+  } else if (type == "buyer") {
+    allTime = await Buyer.findById(id).select("user.balance");
+    allTime = allTime.user.balance;
+  } else if (type == "shop") {
+    allTime = await Shop.findById(id).select("balance");
+    allTime = allTime.balance;
+  } else return null;
+  return allTime;
+};
+
+// returns the balance of entity as per the passed timeline
+const getBalanceAnalytics = async (objID, type, timeline) => {
+  const startDate = moment().startOf(timeline).toDate();
+  const endDate = moment().endOf(timeline).toDate();
+  const balanceOfTimeline = await Transaction.aggregate([
+    {
+      $match: {
+        $and: [
+          {
+            $or: [{ buyerID: objID }, { shopID: objID }, { merchantID: objID }],
+          },
+          {
+            createdAt: {
+              $gte: startDate,
+              $lt: endDate,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: "$recordType",
+        amount: { $sum: "$amount" },
+      },
+    },
+  ]);
+
+  let debit = 0,
+    credit = 0,
+    balance = 0;
+  balanceOfTimeline.forEach((e) => {
+    if (e._id == "DEBIT") debit += e.amount;
+    else credit += e.amount;
+  });
+  if (type == "buyer") balance = debit - credit;
+  else balance = credit - debit;
+  return {
+    balance,
+    debit,
+    credit,
+  };
+};
+
+// @route   GET /api/transaction/balanceanalytics/{buyerID | shopID | merchantID}/?query=type
+// @desc    Get all balance(today,week,month,allTime)details for merchant, shop or buyer
+// @access  Protected
+router.get("/balanceanalytics/:id/", async (req, res) => {
+  const { id } = req.params;
+  const { type } = req.query;
+  const objID = new mongoose.Types.ObjectId(id);
+
+  try {
+    const allTime = await getAllTimeBalance(id, type);
+    if (!allTime) res.status(404).json({ msg: "Invalid request" });
+    const today = await getBalanceAnalytics(objID, type, "day");
+    const week = await getBalanceAnalytics(objID, type, "isoweek");
+    const month = await getBalanceAnalytics(objID, type, "month");
+    res.json({
+      msg: "OK",
+      balanceAnalytics: {
+        today,
+        week,
+        month,
+        allTime,
+      },
+    });
+  } catch (err) {
+    console.log(`err`, err);
+    res.json({ err });
   }
 });
 module.exports = router;
