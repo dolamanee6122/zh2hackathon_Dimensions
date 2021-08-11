@@ -1,19 +1,11 @@
 const Joi = require("joi");
+const bcrypt = require("bcryptjs");
 const express = require("express");
-const UserSchema = require("../../models/User");
-const Merchant = require("../../models/Merchant");
-const mongoose = require("mongoose");
 const router = express.Router();
-
-//Merchant model
-//const Merchant = require("../../models/Merchant");
-const merchants = [
-  { id: 1, name: "merchant1" },
-  { id: 2, name: "merchant2" },
-  { id: 3, name: "merchant3" },
-  { id: 4, name: "merchant4" },
-];
-
+const Merchant = require("../../models/Merchant");
+const Shop = require("../../models/Shop");
+const Transaction = require("../../models/Transaction");
+const auth = require("../../middleware/auth");
 const getInitialBalance = () => {
   return {
     balance: 0,
@@ -22,17 +14,6 @@ const getInitialBalance = () => {
   };
 };
 
-router.get("/", (req, res) => {
-  res.send(merchants);
-});
-
-router.get("/:id", (req, res) => {
-  const merchant = merchants.find((m) => m.id === parseInt(req.params.id));
-  if (!merchant)
-    return res.status(404).send("Given merchant ID does not exist");
-  res.send(merchant);
-});
-
 // @route   POST /api/merchants
 // @desc    register a new merchants
 // @access  Public
@@ -40,12 +21,57 @@ router.post("/", async (req, res) => {
   const { user } = req.body;
   user.balance = getInitialBalance();
   try {
+    //TODO check if the emailID/mobileNo already exist
     const merchant = new Merchant({ user });
-    console.log(`merchant`, merchant);
     await merchant.save();
     res.json({ message: "Merchant Added", merchant });
   } catch (err) {
-    console.log(err);
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
+});
+
+//const get
+
+// @route   GET /api/merchants/{merchantID}
+// @desc    get information of a particular merchant
+// @access  Protected
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const merchant = await Merchant.findById(id);
+    if (!merchant)
+      return res.status(404).json({ message: "Invalid merchantID" });
+
+    res.json({ message: "OK", merchant });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
+});
+
+// @route   POST /api/merchants/signin
+// @desc    login for merchant
+// @access  public
+router.post("/signin", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const merchantLogin = await Merchant.findOne({ "user.email": email });
+    if (
+      !merchantLogin ||
+      !(await bcrypt.compare(password, merchantLogin.user.password))
+    )
+      return res.status(404).json({ message: "Invalid credentials" });
+    const token = await merchantLogin.user.generateAuthToken(merchantLogin._id);
+    // merchantLogin.save();
+    // res.cookie("jwtoken", token, {
+    //   expires: new Date(Date.now() + 2589200000),
+    //   httpOnly: true,
+    // });
+    res.json({ message: "Signed In successfully", token, merchantLogin });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
   }
 });
 

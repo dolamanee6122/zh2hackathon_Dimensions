@@ -22,6 +22,11 @@ const TransactionSchema = new Schema(
       ref: "shops",
       required: true,
     },
+    merchantID: {
+      type: Schema.Types.ObjectId,
+      ref: "merchants",
+      required: true,
+    },
     previousBalance: {
       type: Number,
       required: true,

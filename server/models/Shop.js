@@ -31,6 +31,10 @@ const shopSchema = new Schema(
       type: String,
       required: true,
     },
+    merchantName: {
+      type: String,
+      required: true,
+    },
     address: {
       type: AddressSchema,
       required: true,

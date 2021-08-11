@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
+const moment = require("moment");
 const Transaction = require("../../models/Transaction");
 const Merchant = require("../../models/Merchant");
 const Shop = require("../../models/Shop");
 const Buyer = require("../../models/Buyer");
-//const Request = require("../../models/Buyer");
+const Request = require("../../models/Request");
 
 // update balance of buyer for the current transaction
 const updateBalanceBuyer = (buyer, shopID, transaction, recordType, amount) => {
@@ -102,13 +104,19 @@ const updateBalance = (
   updateBalanceMerchant(merchant, recordType, amount);
 };
 
+// @route   POST /api/transaction/
+// @desc    do a new transaction with requestID
+// @access  Protected
 router.post("/", async (req, res) => {
   //console.log(req.body);
   const { requestID, attributes } = req.body;
 
-  Request.findById(requestID, (err, request) => {
-    if (err) return console.log(err);
-    //console.log(`request`, request);
+  try {
+    const request = await Request.findById(requestID);
+    if (!request) return res.status(404).json({ message: "Invalid request" });
+
+    if (request.status !== "PENDING")
+      return res.json({ message: "Transaction already done" });
     const {
       buyer: { buyerID },
       shop: { shopID },
@@ -117,78 +125,185 @@ router.post("/", async (req, res) => {
       recordType,
     } = request;
     currency = "INR";
-    // const trxnRequest = {
-    //   buyerID: request.buyer.buyerID,
-    //   shopID: request.shop.shopID,
-    //   amount: request.amount,
-    //   paymentMode: request.paymentMode,
-    //   recordType: request.recordType,
-    //   currency: "INR",
-    //   attributes,
-    // };
 
-    try {
-      const transaction = new Transaction({
-        buyerID,
-        shopID,
-        amount,
-        paymentMode,
-        recordType,
-        currency,
-        attributes,
-      });
+    const buyer = await Buyer.findById(buyerID);
+    const shop = await Shop.findById(shopID);
 
-      //TODO handle case when buyerID, shopID, merchantID not found
-      //TODO check if the request has been already approved or failed
-      Buyer.findById(request.buyer.buyerID, async (err, buyer) => {
-        if (err) return console.log(err);
-        Shop.findById(request.shop.shopID, async (err, shop) => {
-          if (err) return console.log(err);
-          const merchantID = shop.merchantID;
-          Merchant.findById(merchantID, async (err, merchant) => {
-            if (err) return console.log(err);
-            //console.log(merchant);
+    if (!buyer || !shop)
+      return res.status(404).json({ message: "Invalid request" });
+    const { merchantID } = shop;
+    const merchant = await Merchant.findById(merchantID);
+    if (!merchant) return res.status(404).json({ message: "Invalid request" });
+    const transaction = new Transaction({
+      buyerID,
+      shopID,
+      merchantID,
+      amount,
+      paymentMode,
+      recordType,
+      currency,
+      attributes,
+    });
 
-            updateBalance(
-              buyer,
-              shop,
-              merchant,
-              transaction,
-              recordType,
-              amount,
-              currency
-            );
-            await buyer.save();
-            await shop.save();
-            await merchant.save();
-            await transaction.save();
+    updateBalance(
+      buyer,
+      shop,
+      merchant,
+      transaction,
+      recordType,
+      amount,
+      currency
+    );
 
-            request.status = "APPROVED";
-            await request.save();
-            //console.log(`request`, request);
-            return res.json({
-              status: "Payment Successful...",
-              buyer,
-              shop,
-              merchant,
-              transaction,
-              request,
-            });
-          });
-        });
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  });
+    request.status = "APPROVED";
+    await request.save();
+    await buyer.save();
+    await shop.save();
+    await merchant.save();
+    await transaction.save();
+
+    //TODO update the rating of buyer/shop/merchant if required
+    return res.json({
+      status: "Payment Successful...",
+      buyer,
+      shop,
+      merchant,
+      transaction,
+      request,
+    });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
 });
 
-router.get("/:id", (req, res) => {
+// @route   GET /api/transaction/id/{transactionID}
+// @desc    Get information for a transactionID
+// @access  Protected
+router.get("/id/:id", async (req, res) => {
   const { id } = req.params;
-  Transaction.findById(id, (err, transaction) => {
-    if (err) return res.status(404).json({ error: err });
+
+  //TODO define and implement who have access to transaction
+  try {
+    const transaction = await Transaction.findById(id);
+    if (!transaction)
+      return res.status(404).json({ message: "Invalid Transaction ID" });
     res.json({ message: "OK", transaction });
-  });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
 });
 
+// @route   GET /api/transaction/{buyerID | shopID | merchantID}
+// @desc    Get all transaction details for merchant, shop or buyer
+// @access  Protected
+router.get("/:id/", async (req, res) => {
+  const { id } = req.params;
+
+  const { limit } = req.query;
+
+  try {
+    const transactions = await Transaction.find({
+      $or: [{ buyerID: id }, { shopID: id }, { merchantID: id }],
+    })
+      .sort({ _id: -1 })
+      .limit(parseInt(limit));
+    if (!transactions)
+      return res.status(404).json({ message: "No transaction found" });
+    res.json({ message: "OK", transactions });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
+});
+
+// returns the balance of entity from beginning
+const getAllTimeBalance = async (id, type) => {
+  let allTime;
+  if (type == "merchant") {
+    allTime = await Merchant.findById(id).select("user.balance");
+    allTime = allTime.user.balance;
+  } else if (type == "buyer") {
+    allTime = await Buyer.findById(id).select("user.balance");
+    allTime = allTime.user.balance;
+  } else if (type == "shop") {
+    allTime = await Shop.findById(id).select("balance");
+    allTime = allTime.balance;
+  } else return null;
+  return allTime;
+};
+
+// returns the balance of entity as per the passed timeline
+const getBalanceAnalytics = async (objID, type, timeline) => {
+  const startDate = moment().startOf(timeline).toDate();
+  const endDate = moment().endOf(timeline).toDate();
+  const balanceOfTimeline = await Transaction.aggregate([
+    {
+      $match: {
+        $and: [
+          {
+            $or: [{ buyerID: objID }, { shopID: objID }, { merchantID: objID }],
+          },
+          {
+            createdAt: {
+              $gte: startDate,
+              $lt: endDate,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: "$recordType",
+        amount: { $sum: "$amount" },
+      },
+    },
+  ]);
+
+  let debit = 0,
+    credit = 0,
+    balance = 0;
+  balanceOfTimeline.forEach((e) => {
+    if (e._id == "DEBIT") debit += e.amount;
+    else credit += e.amount;
+  });
+  if (type == "buyer") balance = debit - credit;
+  else balance = credit - debit;
+  return {
+    balance,
+    debit,
+    credit,
+  };
+};
+
+// @route   GET /api/transaction/balanceanalytics/{buyerID | shopID | merchantID}/?query=type
+// @desc    Get all balance(today,week,month,allTime)details for merchant, shop or buyer
+// @access  Protected
+router.get("/balanceanalytics/:id/", async (req, res) => {
+  const { id } = req.params;
+  const { type } = req.query;
+  const objID = new mongoose.Types.ObjectId(id);
+
+  try {
+    const allTime = await getAllTimeBalance(id, type);
+    if (!allTime) res.status(404).json({ msg: "Invalid request" });
+    const today = await getBalanceAnalytics(objID, type, "day");
+    const week = await getBalanceAnalytics(objID, type, "isoweek");
+    const month = await getBalanceAnalytics(objID, type, "month");
+    res.json({
+      msg: "OK",
+      balanceAnalytics: {
+        today,
+        week,
+        month,
+        allTime,
+      },
+    });
+  } catch (err) {
+    console.log(`err`, err);
+    res.json({ err });
+  }
+});
 module.exports = router;
