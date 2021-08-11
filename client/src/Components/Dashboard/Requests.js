@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import EachRequest from "./EachRequest";
-export default function Requests({request}) {
+export default function Requests({request,id,accountType}) {
   console.log('from Requests',request);
 
   return (
@@ -14,7 +14,13 @@ export default function Requests({request}) {
         return <EachRequest data={e}/>
       })}
       <div>
-        <Link to="/requests">See More Requests</Link>
+        <Link to={{
+          pathname:"/requests",
+          props:{
+            id:{id},
+            accountType:{accountType}
+          }
+        }}>See More Requests</Link>
       </div>
 
     </div>

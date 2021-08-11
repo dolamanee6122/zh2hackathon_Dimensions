@@ -2,14 +2,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const app = express();
-
+const config = require("config");
 //BodyParser middleware
 app.use(express.json());
-var cors = require('cors');
+var cors = require("cors");
 app.use(cors());
 //DB config
-const db = require("./config/keys").mongoURI;
-console.log('db',db);
+const db = config.get("mongoURI");
+console.log("db", db);
 
 //connect to mongo
 mongoose

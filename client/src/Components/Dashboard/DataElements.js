@@ -98,7 +98,7 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
   
-const DataElements = ({stats,request}) => {
+const DataElements = ({stats,request,id,accountType}) => {
     
     console.log('dstat',stats)
     const classes = useStyles();
@@ -112,7 +112,7 @@ const DataElements = ({stats,request}) => {
               <Paper className={fixedHeightPaper}>
                 <StatCards
                   title={"Today"}
-                  balance={stats}
+                  balance={stats.today}
                   lastUpdated={"53 mins ago"}
                 />
               </Paper>
@@ -122,7 +122,7 @@ const DataElements = ({stats,request}) => {
               <Paper className={fixedHeightPaper}>
                 <StatCards
                   title={"This Week"}
-                  balance={stats}
+                  balance={stats.week}
                   lastUpdated={"7-15 August 2021"}
                 />
               </Paper>
@@ -132,7 +132,7 @@ const DataElements = ({stats,request}) => {
               <Paper className={fixedHeightPaper}>
                 <StatCards
                   title={"This Month"}
-                  balance={stats}
+                  balance={stats.month}
                   lastUpdated={"21 August 2021"}
                 />
               </Paper>
@@ -142,7 +142,7 @@ const DataElements = ({stats,request}) => {
               <Paper className={fixedHeightPaper}>
                 <StatCards
                   title={"All Tieme"}
-                  balance={stats}
+                  balance={stats.allTime}
                   lastUpdated="July-Sept"
                 />
               </Paper>
@@ -156,7 +156,7 @@ const DataElements = ({stats,request}) => {
             {/*Request*/}
             <Grid item xs={12} md={10} lg={5}>
               <Paper className={requests}>
-                <Requests  request={request}/>
+                <Requests  request={request} id={id} accountType={accountType} />
               </Paper>
             </Grid>
           </Grid>

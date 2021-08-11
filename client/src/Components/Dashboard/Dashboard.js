@@ -141,21 +141,29 @@ export default function Dashboard() {
     setMerchantInfo(info.merchant);
     // console.log(`merchnatInfo`, merchantInfo)
     setShops(info.merchant.shopList);
-    setStats(info.merchant.user.balance);
+    // setStats(info.merchant.user.balance);
+    await fetchStats(id,"merchant");
     await fetchRequests(id);
      setLoading(false);
   }
   async function fetchRequests(id){
     console.log("@request");
-    const URL=BASE_URL+"request/"+id;
-    // console.log(`URL`, URL);
+    const URL=BASE_URL+"request/"+id+"/?limit=3";
     const response = await fetch(`${URL}`);
     const info = await response.json();
-    console.log("------------------->",info);
+    console.log("Requests------------------->",info);
     setRequest(info.requests);
     setLoading(false);
-    //setMerchantInfo(info.merchant);
-    //setShops(info.merchant.shopList)
+  }
+
+  async function fetchStats(id,type){
+    console.log("from fetchStats");
+    const URL=BASE_URL+"transaction/balanceanalytics/"+id+"/?type="+type;
+    console.log(`URL`, URL);
+    const response = await fetch(`${URL}`);
+    const info = await response.json();
+    console.log("stats------------------->",info);
+    setStats(info.balanceAnalytics);
   }
   async function fetchShopDetails(id){
     console.log("@shopDetails");
@@ -163,8 +171,9 @@ export default function Dashboard() {
     console.log(`URL`, URL);
     const response = await fetch(`${URL}`);
     const info = await response.json();
-    console.log("------------------->",info);
+    console.log("shop------------------->",info);
     setStats(info.shop.balance);
+    await fetchStats(id,"shop")
     await fetchRequests(id);
     setLoading(false);
     //setMerchantInfo(info.merchant);
@@ -179,13 +188,13 @@ export default function Dashboard() {
   const handleShopChange=(e)=>{
       e.preventDefault();
       setSelectedShop(e.target.value);
-      console.log(selectedShop);
+       console.log(selectedShop);
       if(e.target.value==="all")
       {
-        setStats(merchantInfo.user.balance);
+        fetchStats(id,"merchant");
       }
       else{
-        // setLoading(true)
+         setLoading(true)
         // const ShopID=selectedShop;
         fetchShopDetails(e.target.value);
       }
@@ -272,7 +281,7 @@ export default function Dashboard() {
               <FormHelperText>Select to get Shop-wise analysis</FormHelperText>
             </div>
           </div>
-          <DataElements stats={stats} request={request}/>
+          <DataElements stats={stats} request={request} id={id} accountType={"merchant"}/>
         </Container>
       </main>
     </div>}
