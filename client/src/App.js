@@ -2,20 +2,24 @@ import './App.css';
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 import RequestListing from './Components/RequestPage/RequestListing';
 import Dashboard from './Components/Dashboard/Dashboard';
+import Transaction from './Components/Dashboard/Transactions';
 
 function App() {
   return (
     <div className="App">
-     <Router>
-      <Switch>
-        <Route exact path="/">
-          <Dashboard />
-        </Route>
-        <Route path="/requests">
-          <RequestListing />
-        </Route>
-      </Switch>
-    </Router>
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <Dashboard />
+          </Route>
+          <Route path="/requests">
+            <RequestListing />
+          </Route>
+          <Route path="/transactions">
+            <Transaction />
+          </Route>
+        </Switch>
+      </Router>
     </div>
   );
 }
