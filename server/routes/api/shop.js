@@ -42,7 +42,7 @@ router.post("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const shop = Shop.findById(id);
+    const shop =  await Shop.findById(id);
     if (!shop) return res.status(404).json({ message: "Invalid ShopID" });
     res.json({ message: "OK", shop });
   } catch (err) {

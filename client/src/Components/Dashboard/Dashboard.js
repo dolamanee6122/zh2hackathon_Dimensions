@@ -11,17 +11,13 @@ import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
 import Badge from "@material-ui/core/Badge";
 import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import Link from "@material-ui/core/Link";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import NotificationsIcon from "@material-ui/icons/Notifications";
-import StatCards from "./StatCards";
-import Requests from "./Requests";
-import RecentTransactions from "./RecentTransactions";
 import { mainListItems, secondaryListItems } from "../listItems";
 import BASE_URL from "../../baseURL";
+import DataElements from "./DataElements";
+import { FormHelperText, InputLabel, LinearProgress, MenuItem , Select} from "@material-ui/core";
 
 const drawerWidth = 240;
 
@@ -124,13 +120,17 @@ export default function Dashboard() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-  const requests = clsx(classes.paper, classes.requests);
+
 
   const [merchantInfo,setMerchantInfo]=useState();
   const [loading,setLoading] =useState(true);
+  const [shops,setShops]=useState();
+  const [request,setRequest]=useState();
+  const [selectedShop,setSelectedShop]=useState("all");
+  const [stats,setStats]=useState();
 
-  const id="6112316ca49bb59034d70b79";
+
+  const id="61136f34480a693fb4d49453";
   const apiURL=BASE_URL+"merchants/"+id;
   
   console.log(apiURL);
@@ -139,23 +139,65 @@ export default function Dashboard() {
     const response = await fetch(`${apiURL}`);
     const info = await response.json();
     setMerchantInfo(info.merchant);
-    setLoading(false);
-    console.log("movies",merchantInfo);
+    // console.log(`merchnatInfo`, merchantInfo)
+    setShops(info.merchant.shopList);
+    setStats(info.merchant.user.balance);
+    await fetchRequests(id);
+     setLoading(false);
   }
-  useEffect(()=>{
+  async function fetchRequests(id){
+    console.log("@request");
+    const URL=BASE_URL+"request/"+id;
+    // console.log(`URL`, URL);
+    const response = await fetch(`${URL}`);
+    const info = await response.json();
+    console.log("------------------->",info);
+    setRequest(info.requests);
+    setLoading(false);
+    //setMerchantInfo(info.merchant);
+    //setShops(info.merchant.shopList)
+  }
+  async function fetchShopDetails(id){
+    console.log("@shopDetails");
+    const URL=BASE_URL+"shop/"+id;
+    console.log(`URL`, URL);
+    const response = await fetch(`${URL}`);
+    const info = await response.json();
+    console.log("------------------->",info);
+    setStats(info.shop.balance);
+    await fetchRequests(id);
+    setLoading(false);
+    //setMerchantInfo(info.merchant);
+    //setShops(info.merchant.shopList)
+  }
+  useEffect(async()=>{
     console.log("useEffece t Caked");
-    fetchMerchant();
-    
+   await fetchMerchant();
+   //await fetchRequests();    
   },[]);
   
+  const handleShopChange=(e)=>{
+      e.preventDefault();
+      setSelectedShop(e.target.value);
+      console.log(selectedShop);
+      if(e.target.value==="all")
+      {
+        setStats(merchantInfo.user.balance);
+      }
+      else{
+        // setLoading(true)
+        // const ShopID=selectedShop;
+        fetchShopDetails(e.target.value);
+      }
+  }
 
   return (
     <div>
-   {loading && <h1>lOaDiNg...</h1>}
-   {!loading && <div className={classes.root}>
+      {/* {console.log(`merchantInfo`, merchantInfo)}
+      {console.log(`shopList`, shops)} */}
+      {loading && <LinearProgress  />}
+      {!loading && <div className={classes.root}>
       <CssBaseline />
-      {console.log("mmmmmmmmmmmmmm",merchantInfo,merchantInfo.shopList)}
-      {console.log('ppp')}
       <AppBar
         position="absolute"
         className={clsx(classes.appBar, open && classes.appBarShift)}
@@ -209,64 +251,28 @@ export default function Dashboard() {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
-          <Grid container spacing={3}>
-            {/* Daily */}
-            <Grid item xs={12} md={6} lg={3}>
-              <Paper className={fixedHeightPaper}>
-                <StatCards
-                  title={"Today"}
-                  balance={"appl"}
-                  balance={merchantInfo.user.balance}
-                  lastUpdated={"53 mins ago"}
-                />
-              </Paper>
-            </Grid>
-            {/* weekly */}
-            <Grid item xs={12} md={6} lg={3}>
-              <Paper className={fixedHeightPaper}>
-                <StatCards
-                  style={{ color: "yellow" }}
-                  title={"Thismerchant"}
-                  balance={merchantInfo.user.balance}
-                  lastUpdated={"7-15 August 2021"}
-                />
-              </Paper>
-            </Grid>
-            {/* Monthly */}
-            <Grid item xs={12} md={6} lg={3}>
-              <Paper className={fixedHeightPaper}>
-                <StatCards
-                  title={"This Month"}
-                  balance={"1400"}
-                  balance={merchantInfo.user.balance}
-                  lastUpdated={"21 August 2021"}
-                />
-              </Paper>
-            </Grid>
-            {/*Quarter*/}
-            <Grid item xs={12} md={6} lg={3}>
-              <Paper className={fixedHeightPaper}>
-                <StatCards
-                  title={"All Tieme"}
-                  balance={"1400"}
-                  balance={merchantInfo.user.balance}
-                  lastUpdated="July-Sept"
-                />
-              </Paper>
-            </Grid>
-            {/* Transaction */}
-            <Grid item xs={12} md={10} lg={7}>
-              <Paper className={requests}>
-                <RecentTransactions />
-              </Paper>
-            </Grid>
-            {/*Request*/}
-            <Grid item xs={12} md={10} lg={5}>
-              <Paper className={requests}>
-                <Requests />
-              </Paper>
-            </Grid>
-          </Grid>
+          <div style={{display:"flex"}}>
+            <h2 style={{display:"flex-start"}}>Hi, Merchant</h2>
+            <div style={{marginLeft:"auto"}}>
+            <InputLabel id="shop-dropdown">Shops</InputLabel>
+              <Select
+                labelId="shop-dropdown"
+                value={selectedShop}
+                onChange={handleShopChange}
+              >
+                <MenuItem value="all">
+                  <em>All Shops</em>
+                </MenuItem>
+                { shops.map((e)=>{
+                  return <MenuItem key={e.shopID} value={e.shopID}>{e.shopName}</MenuItem>
+                })
+
+                }
+              </Select>
+              <FormHelperText>Select to get Shop-wise analysis</FormHelperText>
+            </div>
+          </div>
+          <DataElements stats={stats} request={request}/>
         </Container>
       </main>
     </div>}
