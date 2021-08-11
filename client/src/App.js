@@ -2,7 +2,7 @@ import './App.css';
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 import RequestListing from './Components/RequestPage/RequestListing';
 import Dashboard from './Components/Dashboard/Dashboard';
-import Transaction from './Components/Dashboard/Transactions';
+import Transaction from './Components/Dashboard/Transaction/Transactions';
 
 function App() {
   return (
