@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
     const shop = new Shop({
       shopName,
       merchantID,
-      merchantName:merchant.user.firstName+" "+merchant.user.lastName,
+      merchantName: merchant.user.firstName + " " + merchant.user.lastName,
       address,
       rating,
       balance: getInitialBalance(),
@@ -42,7 +42,7 @@ router.post("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const shop =  await Shop.findById(id);
+    const shop = await Shop.findById(id);
     if (!shop) return res.status(404).json({ message: "Invalid ShopID" });
     res.json({ message: "OK", shop });
   } catch (err) {
