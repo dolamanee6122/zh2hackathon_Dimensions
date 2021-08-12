@@ -43,7 +43,8 @@ router.post("/", async (req, res) => {
       return res.status(404).json({ message: "Invalid request" });
     const {merchantID,merchantName}=shop;
     const merchant =Merchant.findById(merchantID);
-    const { firstName, lastName, rating, address } = buyer.user;
+    const { firstName, lastName, address } = buyer.user;
+    const {rating} =buyer;
     const { shopName } = shop;
     const buyerName = firstName + " " + lastName;
     let balanceShopWise = shop.balanceUserWise.find(

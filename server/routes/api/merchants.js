@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
 // @route   GET /api/merchants/{merchantID}
 // @desc    get information of a particular merchant
 // @access  Protected
-router.get("/:id", auth, async (req, res) => {
+router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const merchant = await Merchant.findById(id);
