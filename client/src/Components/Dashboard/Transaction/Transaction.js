@@ -40,8 +40,8 @@ const Transaction = (props) => {
                 <TableCell component="th" scope="row">
                     {row.createdAt}
                 </TableCell>
-                <TableCell align="center">{row.currency}</TableCell>
-                <TableCell align="center">{row.recordType}</TableCell>
+                <TableCell align="center">{row.buyerID}</TableCell>
+                <TableCell align="center">{row.shopID}</TableCell>
                 <TableCell align="center">{row.paymentMode}</TableCell>
                 <TableCell align="center">{row.amount}</TableCell>
             </TableRow>
@@ -50,34 +50,36 @@ const Transaction = (props) => {
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box margin={1}>
                             <Typography variant="h6" gutterBottom component="div">
-                                Description
+                                Details of the transaction
                             </Typography>
                             <Table size="small" aria-label="purchases">
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>Date</TableCell>
-                                        <TableCell>Customer</TableCell>
-                                        <TableCell align="center">Name of the Item</TableCell>
+                                        <TableCell>Merchant ID</TableCell>
+                                        <TableCell align="center">Previos balance</TableCell>
+                                        <TableCell align="center">New balance</TableCell>
                                     </TableRow>
                                 </TableHead>
-                                {/* <TableBody>
-                                    {row.description.map((historyRow) => (
-                                        <TableRow key={historyRow.date}>
-                                            <TableCell component="th" scope="row">
-                                                {historyRow.date}
-                                            </TableCell>
-                                            <TableCell>{historyRow.customerId}</TableCell>
-                                            <TableCell align="center">
-                                                {historyRow.nameOfItem}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                <TableBody>
+                                    <TableRow key={row.date}>
+                                        <TableCell component="th" scope="row">
+                                            {row.updatedAt}
+                                        </TableCell>
+                                        <TableCell>{row.merchantID}</TableCell>
+                                        <TableCell align="center">
+                                            {row.previousBalance}
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            {row.newBalance}
+                                        </TableCell>
+                                    </TableRow>
                                     <Box m={1}>
                                         <Button variant="outlined" color="primary">
                                             Print Bill
                                         </Button>
                                     </Box>
-                                </TableBody> */}
+                                </TableBody>
                             </Table>
                         </Box>
                     </Collapse>
