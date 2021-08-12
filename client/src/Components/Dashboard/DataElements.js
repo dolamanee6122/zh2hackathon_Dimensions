@@ -160,7 +160,7 @@ const DataElements = ({stats,request,id,accountType}) => {
               </Paper>
             </Grid>
           </Grid>
-        <Fab color="primary" aria-label="add" style={{position:"absolute", bottom:"48px", right:"48px"}}>
+        <Fab color="primary" aria-label="add" style={{position:"absolute", bottom:"24px", right:"48px"}}>
             <AddIcon />
         </Fab>
         </div>

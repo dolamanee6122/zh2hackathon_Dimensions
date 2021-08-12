@@ -90,6 +90,19 @@ const Login = () => {
                         <Paper component="form" className={classes.root}>
                         <AlternateEmailIcon/>
                             <TextField
+                                label="First Name"
+                                className={classes.input}
+                                placeholder="first Name"
+                            />
+                             <TextField
+                                label="Last Name"
+                                className={classes.input}
+                                placeholder="lastname"
+                            />
+                        </Paper>
+                        <Paper component="form" className={classes.root}>
+                        <AlternateEmailIcon/>
+                            <TextField
                                 label="Email"
                                 className={classes.input}
                                 placeholder="Email"
@@ -120,6 +133,16 @@ const Login = () => {
                             })
                             }
                             </TextField>
+                        </Paper>
+                        
+                        <Paper component="form" className={classes.root}>
+                        <AlternateEmailIcon/>
+                            <TextField
+                                label="Phone"
+                                className={classes.input}
+                                placeholder="Phone"
+                                fullWidth
+                            />
                         </Paper>
                         <div style={{display:"flex"}}>
                         <Button variant="contained" color="secondary">Submit</Button>
