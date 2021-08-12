@@ -51,6 +51,17 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  try {
+    const shops = await Shop.find({}, { shopName: 1 });
+    if (!shops) return res.status(404).json({ message: "Invalid ShopID" });
+    //console.log(`shops`, shops);
+    res.json({ message: "OK", shops });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
+});
 //TODO
 router.post("/addRequest", async (req, res) => {});
 module.exports = router;
