@@ -112,9 +112,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function RequestListing({handleLogout}) {
-  const location = useLocation();
-  const id = location.props.id.id;
-  console.log(`id`, id);
+
+  const idString = sessionStorage.getItem('userId');
+  const id = JSON.parse(idString);
+
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
