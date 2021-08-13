@@ -26,6 +26,7 @@ const shopSchema = new Schema(
     shopName: {
       type: String,
       required: true,
+      unique: true,
     },
     merchantID: {
       type: String,

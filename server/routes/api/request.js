@@ -82,7 +82,7 @@ router.post("/", auth, async (req, res) => {
       status: "PENDING",
       amount,
       recordType,
-      paymentMode,
+      paymentMode: paymentMode || "None",
       balanceShopWise: balanceShopWise.balance,
     });
 
