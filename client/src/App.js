@@ -3,6 +3,7 @@ import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 import RequestListing from "./Components/RequestPage/RequestListing";
 import Dashboard from "./Components/Dashboard/Dashboard";
 import Transaction from "./Components/Dashboard/Transaction/Transactions";
+import Profile from "./Components/Profile";
 import Login from "./Components/Authentication/Login";
 import AddShop from "./Components/AddShop";
 import CreateRequest from "./Components/CreateRequest";
@@ -55,11 +56,17 @@ function App() {
           <Route path="/requests">
             <RequestListing />
           </Route>
+          <Route path="/transactions">
+            <Transaction />
+          </Route>
           <Route path="/createrequest">
             {accountType === "BUYER" && <CreateRequest />}
           </Route>
           <Route path="/addshop">
             {accountType === "MERCHANT" && <AddShop />}
+          </Route>
+          <Route path="/profile">
+            <Profile />
           </Route>
         </Switch>
       </Router>

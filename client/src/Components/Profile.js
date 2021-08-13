@@ -12,7 +12,6 @@ import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import Transaction from './Transaction'
 import clsx from "clsx";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Drawer from "@material-ui/core/Drawer";
@@ -21,8 +20,8 @@ import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import { mainListItems, secondaryListItems } from "../../listItems";
-import BASE_URL from '../../../baseURL';
+import { mainListItems, secondaryListItems } from "./listItems";
+import BASE_URL from '../baseURL';
 import { LinearProgress, Select } from "@material-ui/core";
 
 const useRowStyles = makeStyles({
@@ -206,7 +205,7 @@ export default function Transactions(props) {
                             noWrap
                             className={classes.title}
                         >
-                            Transactions
+                            Profile
                         </Typography>
                     </Toolbar>
                 </AppBar>
@@ -227,31 +226,9 @@ export default function Transactions(props) {
                     <Divider />
                     <List>{secondaryListItems}</List>
                 </Drawer>
-                <main className={classes.content}>
-                    <div className={classes.appBarSpacer} />
-                    <Box m={9}>
-                        <TableContainer component={Paper}>
-                            <Table aria-label="collapsible table">
-                                <TableHead>
-                                    <TableRow style={{ backgroundColor: "#3f51b5" }}>
-                                        <TableCell />
-                                        <TableCell style={{ fontWeight: "700", color: "white" }}>Date(Value Date)</TableCell>
-                                        <TableCell style={{ fontWeight: "700", color: "white" }} align="center">Buyer Id</TableCell>
-                                        <TableCell style={{ fontWeight: "700", color: "white" }} align="center">Shop Id</TableCell>
-                                        <TableCell style={{ fontWeight: "700", color: "white" }} align="center">Mode of Payment</TableCell>
-                                        <TableCell style={{ fontWeight: "700", color: "white" }} align="center">Debit/Credit</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody >
-                                    {rows.map((row) => (
-                                        <Transaction key={row.name} row={row} />
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Box>
-                </main>
+                <div style={{ margin: "auto" }}>
 
+                </div>
             </div>}
 
         </div >
