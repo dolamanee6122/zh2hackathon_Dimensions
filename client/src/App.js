@@ -6,6 +6,7 @@ import Login from './Components/Authentication/Login';
 import { useState } from 'react';
 import { useCreds } from './Components/Authentication/useCreds';
 import Dashboard from './Components/Dashboard/Dashboard';
+import CreateRequest from './Components/CreateRequest/CreateRequest';
 
 
 
@@ -36,6 +37,7 @@ function App() {
             <DashboardB {...props} handleLogout={handleLogout} /> 
             )}
             />
+            
         } 
          { accountType==='MERCHANT' &&
             <Route 
@@ -44,6 +46,11 @@ function App() {
             <Dashboard {...props} handleLogout={handleLogout} /> 
             )}
             />
+        } 
+        { accountType==='BUYER' &&
+            <Route path="/createrequest">
+              <CreateRequest/>
+            </Route>
         } 
        <Route 
         path="/requests"
