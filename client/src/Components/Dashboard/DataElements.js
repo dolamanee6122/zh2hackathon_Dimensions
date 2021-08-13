@@ -98,7 +98,7 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
   
-const DataElements = ({stats,request,id,accountType}) => {
+const DataElements = ({stats,request,id,accountType,trxns}) => {
     
     console.log('dstat',stats)
     const classes = useStyles();
@@ -150,7 +150,7 @@ const DataElements = ({stats,request,id,accountType}) => {
             {/* Transaction */}
             <Grid item xs={12} md={10} lg={7}>
               <Paper className={requests}>
-                <RecentTransactions />
+                <RecentTransactions  trxns={trxns}/>
               </Paper>
             </Grid>
             {/*Request*/}

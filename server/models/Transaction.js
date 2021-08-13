@@ -17,16 +17,19 @@ const TransactionSchema = new Schema(
       ref: "buyers",
       required: true,
     },
+    buyerName: String,
     shopID: {
       type: Schema.Types.ObjectId,
       ref: "shops",
       required: true,
     },
+    shopName:String,
     merchantID: {
       type: Schema.Types.ObjectId,
       ref: "merchants",
       required: true,
     },
+    merchantName:String,
     previousBalance: {
       type: Number,
       required: true,

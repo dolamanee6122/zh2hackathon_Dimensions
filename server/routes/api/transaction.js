@@ -137,8 +137,11 @@ router.post("/", auth, async (req, res) => {
     if (!merchant) return res.status(404).json({ message: "Invalid request" });
     const transaction = new Transaction({
       buyerID,
+      buyerName:buyer.user.firstName+" "+buyer.user.lastName, 
       shopID,
+      shopName:shop.shopName,
       merchantID,
+      merchantName:merchant.user.firstName+" "+merchant.user.lastName, 
       amount,
       paymentMode,
       recordType,

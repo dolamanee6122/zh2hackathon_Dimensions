@@ -135,6 +135,7 @@ export default function Dashboard({handleLogout}) {
   const [request, setRequest] = useState();
   const [selectedShop, setSelectedShop] = useState("all");
   const [stats, setStats] = useState();
+  const [trxns,setTrxns] =useState();
 
   // const id = "61136f34480a693fb4d49453";
 
@@ -153,6 +154,7 @@ export default function Dashboard({handleLogout}) {
     setShops(info.merchant.shopList);
     // setStats(info.merchant.user.balance);
     await fetchStats(id, "merchant");
+    await fetchTransactions(id);
     await fetchRequests(id);
     setLoading(false);
   }
@@ -164,6 +166,16 @@ export default function Dashboard({handleLogout}) {
     console.log("Requests------------------->", info);
     setRequest(info.requests);
     setLoading(false);
+  }
+  
+  async function fetchTransactions(id) {
+    console.log("@trn");
+    const URL = BASE_URL + "transaction/" + id + "/?limit=3";
+    const response = await fetch(`${URL}`);
+    const info = await response.json();
+    console.log("Trxn------------------->", info);
+    // setRequest(info.reque);
+    setTrxns(info.transactions);
   }
 
   async function fetchStats(id, type) {
@@ -304,6 +316,7 @@ export default function Dashboard({handleLogout}) {
               <DataElements
                 stats={stats}
                 request={request}
+                trxns={trxns}
                 id={id}
                 accountType={"merchant"}
               />

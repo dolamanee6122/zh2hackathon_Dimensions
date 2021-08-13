@@ -9,6 +9,7 @@ import {
 import React from "react";
 
 const TrxnTable = ({ rows }) => {
+  console.log(`rows in Trxn Tbale ***********************************`, rows)
   return (
     <div>
       <Table size="small">
@@ -16,19 +17,22 @@ const TrxnTable = ({ rows }) => {
           <TableRow>
             <TableCell>Date</TableCell>
             <TableCell>Name</TableCell>
-            <TableCell>Ship To</TableCell>
-            <TableCell>Payment Method</TableCell>
-            <TableCell align="right">Sale Amount</TableCell>
+            <TableCell>To</TableCell>
+            <TableCell>Method</TableCell>
+            <TableCell align="right">Amount</TableCell>
+            <TableCell ></TableCell>
+
           </TableRow>
         </TableHead>
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.id}>
-              <TableCell>{row.date}</TableCell>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.shipTo}</TableCell>
-              <TableCell>{row.paymentMethod}</TableCell>
+              <TableCell>{row.updatedAt.substr(0,10)}</TableCell>
+              <TableCell>{row.buyerName}</TableCell>
+              <TableCell>{row.shopName}</TableCell>
+              <TableCell>{row.paymentMode}</TableCell>
               <TableCell align="right">{row.amount}</TableCell>
+              <TableCell >{row.recordType}</TableCell>
             </TableRow>
           ))}
         </TableBody>
