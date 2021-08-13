@@ -1,4 +1,4 @@
-import { Button,FormHelperText,Select,InputLabel,MenuItem,Slide, TextField } from '@material-ui/core';
+import { Button,FormHelperText,Select,InputLabel,MenuItem,Slide, TextField, FormControl } from '@material-ui/core';
 import React, { useState } from 'react';
 import {ReactComponent as Svg} from "../../assets/login_logo.svg";
 import "./Login.css";
@@ -6,7 +6,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
-
+import PersonIcon from '@material-ui/icons/Person';
+import PhoneIcon from '@material-ui/icons/Phone';
+import BASE_URL from '../../baseURL';
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -18,7 +21,15 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const Login = () => {
+const initialValues={
+    firstName:"",
+    lastName:"",
+    phone:"",
+    email:"",
+    password:"",
+}
+
+const Login = ({setCreds}) => {
     const classes = useStyles();
     const transitionDuration = 500;
     const handleClick=(e)=>{
@@ -29,19 +40,116 @@ const Login = () => {
             if(active==="login") setActive("register");
             else setActive("login");
         },transitionDuration);
+        setValues(initialValues)
+        setMessage("");
        
     }
+    const [message,setMessage]=useState("");
+    const [values,setValues]=useState(initialValues);
     const [elementIn,setElementIn]=useState(true);
     const [active,setActive] =useState("login");
-    const types=["MERCHANT", "CONSUMER"];
+    const types=["MERCHANT", "BUYER"];
     const [selectedType,setSelectedType]=useState(types[0]);
     const handleTypeChange=(e)=>{
         e.preventDefault();
         setSelectedType(e.target.value);
     }
+
+    const handleInputChange=(e)=>{
+        const name=e.target.name;
+        const value=e.target.value;
+        setValues({
+            ...values,
+            [name]: value,
+          });
+    }
+
+    async function RegisterUser(){
+            let URL;
+            URL=(selectedType==='MERCHANT')?BASE_URL+"merchants/":BASE_URL+"buyers/";
+            console.log(`URL`, URL)
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({user:{firstName:`${values.firstName}`,
+                                    lastName:`${values.lastName}`, 
+                                    email:`${values.email}`,
+                                    password:`${values.password}`,
+                                    mobileNo:`${values.phone}`,
+                                    accountType:`${selectedType.toLowerCase()}`
+                                 }})
+            };
+            console.log(`requestOptions.body`, requestOptions.body)
+             fetch(`${URL}`,requestOptions)
+                .then((response)=>{
+                    console.log(`response`, response);
+                    if(response.status===200)
+                    {
+                        setMessage("Registered!!, Please Login")
+                    }
+                    else
+                    {
+                        setMessage("Error in Registering");
+                    }
+                })
+                .catch((err)=>console.log(`err`, err))
+    }
+
+
+    async function LoginUser(){
+        let URL;
+        URL=(selectedType==='MERCHANT')?BASE_URL+"merchants/signin":BASE_URL+"buyers/signin";
+        console.log(`URL`, URL)
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                                email:`${values.email}`,
+                                password:`${values.password}`,
+                                })
+        };
+        // const response = await fetch(`${apiURL}`);
+        // const info = await response.json();
+        console.log(`requestOptions.body`, requestOptions.body)
+         fetch(`${URL}`,requestOptions)
+            .then(async(response)=>{
+                const info= await response.json();
+               
+                if(response.status===200)
+                {
+                    // setMessage("Registered!!, Please Login")
+                    setCreds({id:(selectedType==='MERCHANT'?info.merchantID:info.buyerID),
+                    token:info.token,
+                    accountType:(selectedType==='MERCHANT'?"MERCHANT":"BUYER")});
+                  
+                }
+                else
+                {
+                    setMessage("Invalid Credentials");
+                }
+            })
+            .catch((err)=>console.log(`err`, err))
+
+            await setValues(initialValues);
+    }
+
+     const  handleRegister=(e)=>{
+        e.preventDefault();
+        console.log("in Reguster",values);
+        RegisterUser();
+        // setValues(initialValues);
+    }
+    const handleLogin=(e)=>{
+        e.preventDefault();
+        console.log("in login",values);
+        LoginUser();
+        // setValues(initialValues);
+    }
     return (
         <div style={{display:"flex", height:"95vh" ,alignItems:"center", justifyContent:"space-evenly"}}>
+            
             <div >
+            <h1>DIMENSIONS</h1>
             <Svg style={{height:"50%",transform: "scale(0.5)"}}/>
             </div>
             <div style={{display:"flex", backgroundColor:"#6C63FF", height:"100%",flex:1, alignItems:"center", justifyContent:"center", flexDirection:"column" }}>
@@ -63,7 +171,11 @@ const Login = () => {
                                 label="Email"
                                 className={classes.input}
                                 placeholder="Email"
+                                name="email"
                                 fullWidth
+                                required
+                                value={values.email}
+                                onChange={handleInputChange}
                             />
                         </Paper>
                         <Paper component="form" className={classes.root}>
@@ -72,13 +184,33 @@ const Login = () => {
                             <TextField
                                 label="Password"
                                 type="password"
+                                name="password"
                                 className={classes.input}
                                 fullWidth
                                 placeholder="Password"
+                                requiredvalue={values.password}
+                                onChange={handleInputChange}
                             />
                         </Paper>
+                        <Paper component="form" className={classes.root} >
+                            <TextField
+                                select
+                                label="Account Type"
+                                name="accountType"
+                                value={selectedType}
+                                onChange={handleTypeChange}
+                                fullWidth
+                                required
+                                helperText="Select account that suits you"
+                            >
+                            { types.map((e)=>{
+                                return <MenuItem key={e} value={e}>{e}</MenuItem>
+                            })
+                            }
+                            </TextField>
+                        </Paper>
                         <div style={{display:"flex"}}>
-                        <Button variant="contained" color="secondary">Submit</Button>
+                        <Button variant="contained" color="secondary" onClick={handleLogin}>Submit</Button>
                         <Button onClick={handleClick}>{active==="login"?"REGISTER":"LOGIN"}</Button>
                         </div>
                     </div>}
@@ -88,16 +220,24 @@ const Login = () => {
                         REGISTER
                         </div>
                         <Paper component="form" className={classes.root}>
-                        <AlternateEmailIcon/>
+                        <PersonIcon/>
                             <TextField
                                 label="First Name"
+                                name="firstName"
                                 className={classes.input}
                                 placeholder="first Name"
+                                required
+                                value={values.firstName}
+                                onChange={handleInputChange}
                             />
+                            <hr/>
                              <TextField
                                 label="Last Name"
+                                name="lastName"
                                 className={classes.input}
                                 placeholder="lastname"
+                                value={values.lastName}
+                                onChange={handleInputChange}
                             />
                         </Paper>
                         <Paper component="form" className={classes.root}>
@@ -105,8 +245,12 @@ const Login = () => {
                             <TextField
                                 label="Email"
                                 className={classes.input}
+                                name="email"
                                 placeholder="Email"
                                 fullWidth
+                                required
+                                value={values.email}
+                                onChange={handleInputChange}
                             />
                         </Paper>
                         <Paper component="form" className={classes.root}>
@@ -114,9 +258,13 @@ const Login = () => {
                             <TextField
                                 label="Password"
                                 type="password"
+                                name="password"
                                 className={classes.input}
                                 placeholder="Password"
                                 fullWidth
+                                required
+                                value={values.password}
+                                onChange={handleInputChange}
                             />
                         </Paper>
                         <Paper component="form" className={classes.root} >
@@ -124,9 +272,12 @@ const Login = () => {
                                 select
                                 label="Account Type"
                                 value={selectedType}
+                                name="accountType"
                                 onChange={handleTypeChange}
                                 fullWidth
                                 helperText="Select account that suits you"
+                                required
+                                
                             >
                             { types.map((e)=>{
                                 return <MenuItem key={e} value={e}>{e}</MenuItem>
@@ -136,18 +287,22 @@ const Login = () => {
                         </Paper>
                         
                         <Paper component="form" className={classes.root}>
-                        <AlternateEmailIcon/>
+                        <PhoneIcon/>
                             <TextField
                                 label="Phone"
+                                name="phone"
                                 className={classes.input}
                                 placeholder="Phone"
                                 fullWidth
+                                value={values.phone}
+                                onChange={handleInputChange}
                             />
                         </Paper>
                         <div style={{display:"flex"}}>
-                        <Button variant="contained" color="secondary">Submit</Button>
+                        <Button type="submit" variant="contained" color="secondary" onClick={handleRegister}>Submit</Button>
                         <Button onClick={handleClick} >{active==="login"?"REGISTER":"LOGIN"}</Button>
                         </div>
+                        <div style={{backgroundColor:"greenyellow"}}>{message}</div>
                     </div>}
                 </div>
             </Slide>
@@ -157,4 +312,7 @@ const Login = () => {
     )
 }
 
+Login.propTypes = {
+    setToken: PropTypes.func.isRequired
+  }
 export default Login;

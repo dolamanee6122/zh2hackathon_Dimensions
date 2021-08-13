@@ -19,27 +19,28 @@ const getInitialBalance = () => {
 // @access  Public
 router.post("/", async (req, res) => {
   const { user } = req.body;
+  // TODO validate before registering a new merchant
   user.balance = getInitialBalance();
   try {
     //TODO check if the emailID/mobileNo already exist
     const merchant = new Merchant({ user });
     await merchant.save();
-    res.json({ message: "Merchant Added", merchant });
+    res.json({ message: "Merchant Added", merchantID: merchant._id });
   } catch (err) {
     console.log(`err`, err);
     res.status(500).json({ err });
   }
 });
 
-//const get
-
 // @route   GET /api/merchants/{merchantID}
-// @desc    get information of a particular merchant
+// @desc    Get information of a particular merchant by his id
 // @access  Protected
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
   const { id } = req.params;
   try {
-    const merchant = await Merchant.findById(id);
+    const merchant = await Merchant.findById(id).select(
+      "-user.password -user.tokens"
+    );
     if (!merchant)
       return res.status(404).json({ message: "Invalid merchantID" });
 
@@ -51,8 +52,8 @@ router.get("/:id", async (req, res) => {
 });
 
 // @route   POST /api/merchants/signin
-// @desc    login for merchant
-// @access  public
+// @desc    Login for merchant
+// @access  Public
 router.post("/signin", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -68,35 +69,18 @@ router.post("/signin", async (req, res) => {
     //   expires: new Date(Date.now() + 2589200000),
     //   httpOnly: true,
     // });
-    res.json({ message: "Signed In successfully", token, merchantLogin });
+    res.json({
+      message: "Signed In successfully",
+      merchantID: merchantLogin._id,
+      token,
+    });
   } catch (err) {
     console.log(`err`, err);
     res.status(500).json({ err });
   }
 });
 
-router.put("/:id", (req, res) => {
-  const merchant = merchants.find((m) => m.id === parseInt(req.params.id));
-  if (!merchant)
-    return res.status(404).send("Given merchant ID does not exist");
-
-  const { error } = validateMerchant(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
-  merchant.name = req.body.name;
-  res.send(merchant);
-});
-
-router.delete("/:id", (req, res) => {
-  const merchant = merchants.find((m) => m.id === parseInt(req.params.id));
-  if (!merchant)
-    return res.status(404).send("Given merchant ID does not exist");
-
-  const index = merchants.indexOf(merchant);
-  merchants.splice(index, 1);
-  res.send(merchant);
-});
-
+//TODO create a middleware for this
 validateMerchant = (merchant) => {
   const schema = Joi.object({
     name: Joi.string().min(3).required(),
