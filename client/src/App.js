@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useCreds } from './Components/Authentication/useCreds';
 import Dashboard from './Components/Dashboard/Dashboard';
 import CreateRequest from './Components/CreateRequest/CreateRequest';
+import Transactions from './Components/Transaction/Transactions';
 
 
 
@@ -58,6 +59,9 @@ function App() {
           <RequestListing {...props} handleLogout={handleLogout} />
         )}
         />
+         <Route path="/transactions">
+              <Transactions/>
+            </Route>
       </Switch>
     </Router>
     </div>

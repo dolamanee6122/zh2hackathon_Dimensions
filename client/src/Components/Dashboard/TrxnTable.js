@@ -1,5 +1,4 @@
 import {
-  Link,
   Table,
   TableBody,
   TableCell,
@@ -7,6 +6,7 @@ import {
   TableRow
 } from "@material-ui/core";
 import React from "react";
+import { Link } from "react-router-dom";
 
 const TrxnTable = ({ rows }) => {
   console.log(`rows in Trxn Tbale ***********************************`, rows)
@@ -38,7 +38,7 @@ const TrxnTable = ({ rows }) => {
         </TableBody>
       </Table>
       <div>
-        <Link color="primary" href="/transactions">
+        <Link to='/transactions'>
           See more Transactions
         </Link>
       </div>

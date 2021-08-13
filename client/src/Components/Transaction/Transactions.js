@@ -33,35 +33,6 @@ const useRowStyles = makeStyles({
     }
 });
 
-function createData(date, sender, narration, mop, debit, credit) {
-    return {
-        date,
-        sender,
-        narration,
-        mop,
-        debit,
-        credit,
-        description: [
-            { date: "2020-01-05", customerId: "11091700", nameOfItem: "Tatti" },
-            { date: "2020-01-02", customerId: "29846111", nameOfItem: "Cow dung" }
-        ]
-    };
-}
-
-
-const rows = [
-    createData(
-        "15-06-2001",
-        "Gaurav",
-        "BY TRANSFER UPI/CR/121778581431/SHIV SIN/PUNB/shivsinghm/UPI",
-        "UPI",
-        4.0,
-        3.99
-    )
-];
-
-
-
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -158,7 +129,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Transactions(props) {
     const classes = useStyles();
-    const id = "61136f34480a693fb4d49453";
+    const id = JSON.parse(sessionStorage.getItem("userId"));
+    const accountType = JSON.parse(sessionStorage.getItem("accountType"));
+    // console.log(id)
     const [open, setOpen] = React.useState(true);
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -168,14 +141,16 @@ export default function Transactions(props) {
     };
     const [loading, setLoading] = useState(false);
     const [rows, setRows] = useState([]);
+
+
     useEffect(async () => {
         const URL = BASE_URL + "transaction/" + id;
         const res = await fetch(URL);
         const data = await res.json();
-        console.log(data.transactions);
-        console.log("hello");
+        console.log("hello", data.transactions);
         setRows(data.transactions);
     }, [])
+
 
     return (
         <div>
@@ -233,20 +208,19 @@ export default function Transactions(props) {
                         <TableContainer component={Paper}>
                             <Table aria-label="collapsible table">
                                 <TableHead>
-                                    <TableRow>
+                                    <TableRow style={{ backgroundColor: "#3f51b5" }}>
                                         <TableCell />
-                                        <TableCell>Date(Value Date)</TableCell>
-                                        <TableCell align="center">Sender</TableCell>
-                                        <TableCell align="center">Narration</TableCell>
-                                        <TableCell align="center">Mode of Payment</TableCell>
-                                        <TableCell align="center">Debit/Credit</TableCell>
+                                        <TableCell style={{ fontWeight: "700", color: "white" }}>Date(Value Date)</TableCell>
+                                        <TableCell style={{ fontWeight: "700", color: "white" }} align="center">{accountType === "MERCHANT" ? `Buyer` : `Merchant`}</TableCell>
+                                        <TableCell style={{ fontWeight: "700", color: "white" }} align="center">Shop</TableCell>
+                                        <TableCell style={{ fontWeight: "700", color: "white" }} align="center">Mode of Payment</TableCell>
+                                        <TableCell style={{ fontWeight: "700", color: "white" }} align="center">Debit/Credit</TableCell>
                                     </TableRow>
                                 </TableHead>
-                                <TableBody>
+                                <TableBody >
                                     {rows.map((row) => (
-                                        <Transaction key={row.name} row={row} />
+                                        <Transaction key={row.key} row={row} />
                                     ))}
-                                    {/* <h1>hello</h1> */}
                                 </TableBody>
                             </Table>
                         </TableContainer>
