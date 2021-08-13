@@ -11,30 +11,6 @@ import CreateRequest from "./Components/CreateRequest";
 import { useState } from "react";
 import { useCreds } from "./Components/Authentication/useCreds";
 
-// function setCreds(id,token){
-//   sessionStorage.setItem('token', JSON.stringify(token));
-//   sessionStorage.setItem('id', JSON.stringify(id));
-// }
-
-// function getToken(){
-//   const tokenString = sessionStorage.getItem('token');
-//   const userToken = JSON.parse(tokenString);
-//   return userToken?.token
-// }
-//  function getId()
-//  {
-//   const idString = sessionStorage.getItem('id');
-//   const userId = JSON.parse(idString);
-//   return userId?.token
-//  }
-
-//  function getCreds()
-//  {
-//    const id=getId();
-//    const token=getToken();
-//    return {id:id,token:token};
-//  }
-
 function App() {
   const { creds, setCreds } = useCreds();
   // const creds=getCreds();
@@ -45,29 +21,40 @@ function App() {
     return <Login setCreds={setCreds} />;
   }
 
+  const handleLogout = (e) => {
+    e.preventDefault();
+    window.location.reload(true);
+    sessionStorage.clear();
+  };
+
+  <Route
+    path="/dashboard"
+    render={(props) => <Dashboard {...props} isAuthed={true} />}
+  />;
+  {
+    accountType === "MERCHANT" && <Dashboard />;
+  }
+  {
+    accountType === "BUYER" && <Dashboard />;
+  }
+
   return (
     <div className="App">
       <Router>
         <Switch>
-          <Route exact path="/">
-            {accountType === "MERCHANT" && <Dashboard />}
-            {accountType === "BUYER" && <Dashboard />}
-          </Route>
-          <Route path="/requests">
-            <RequestListing />
-          </Route>
-          <Route path="/transactions">
-            <Transaction />
-          </Route>
-          <Route path="/createrequest">
-            {accountType === "BUYER" && <CreateRequest />}
-          </Route>
-          <Route path="/addshop">
-            {accountType === "MERCHANT" && <AddShop />}
-          </Route>
-          <Route path="/profile">
-            <Profile />
-          </Route>
+          <Route
+            exact
+            path="/"
+            render={(props) => (
+              <Dashboard {...props} handleLogout={handleLogout} />
+            )}
+          />
+          <Route
+            path="/requests"
+            render={(props) => (
+              <RequestListing {...props} handleLogout={handleLogout} />
+            )}
+          />
         </Switch>
       </Router>
     </div>

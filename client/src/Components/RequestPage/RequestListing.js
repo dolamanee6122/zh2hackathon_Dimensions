@@ -16,7 +16,7 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import { mainListItems, secondaryListItems } from "../listItems";
 import BASE_URL from "../../baseURL";
-import { FormHelperText, InputLabel, LinearProgress, MenuItem, Select } from "@material-ui/core";
+import { Button, FormHelperText, InputLabel, LinearProgress, MenuItem, Select } from "@material-ui/core";
 import EachRequest from "../Dashboard/EachRequest";
 import { useLocation } from "react-router-dom";
 const drawerWidth = 240;
@@ -111,7 +111,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function RequestListing(props) {
+export default function RequestListing({handleLogout}) {
   const location = useLocation();
   const id = location.props.id.id;
   console.log(`id`, id);
@@ -181,6 +181,7 @@ export default function RequestListing(props) {
                 <NotificationsIcon />
               </Badge>
             </IconButton>
+            <Button  variant="contained" color="secondary" onClick={handleLogout}>Logout</Button>
           </Toolbar>
         </AppBar>
         <Drawer
