@@ -18,6 +18,7 @@ import { mainListItems, secondaryListItems } from "../listItems";
 import BASE_URL from "../../baseURL";
 import DataElements from "./DataElements";
 import {
+  Button,
   FormHelperText,
   InputLabel,
   LinearProgress,
@@ -117,7 +118,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Dashboard() {
+export default function Dashboard({handleLogout}) {
+  
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -246,6 +248,7 @@ export default function Dashboard() {
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
+              <Button  variant="contained" color="secondary" onClick={handleLogout}>Logout</Button>
             </Toolbar>
           </AppBar>
           <Drawer
