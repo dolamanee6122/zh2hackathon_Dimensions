@@ -1,11 +1,11 @@
 import './App.css';
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 import RequestListing from './Components/RequestPage/RequestListing';
-import Dashboard from './Components/Dashboard/Dashboard';
-import Transaction from './Components/Dashboard/Transaction/Transactions';
+import DashboardB from './Components/DashboardB/DashboardB';
 import Login from './Components/Authentication/Login';
 import { useState } from 'react';
 import { useCreds } from './Components/Authentication/useCreds';
+import Dashboard from './Components/Dashboard/Dashboard';
 
 
 
@@ -25,26 +25,26 @@ function App() {
     sessionStorage.clear();
   }
 
-
-  <Route
-  path='/dashboard'
-  render={(props) => (
-    <Dashboard {...props} isAuthed={true} />
-  )}
-/>
-{accountType==="MERCHANT" && <Dashboard />}
-{accountType==="BUYER" && <Dashboard />}
-
   return (
     <div className="App">
      <Router>
       <Switch>
-        <Route 
-        exact path="/"
-        render={(props) => (
-          <Dashboard {...props} handleLogout={handleLogout} />
-        )}
-        />
+        { accountType==='BUYER' &&
+            <Route 
+            exact path="/"
+            render={(props) => (
+            <DashboardB {...props} handleLogout={handleLogout} /> 
+            )}
+            />
+        } 
+         { accountType==='MERCHANT' &&
+            <Route 
+            exact path="/"
+            render={(props) => (
+            <Dashboard {...props} handleLogout={handleLogout} /> 
+            )}
+            />
+        } 
        <Route 
         path="/requests"
         render={(props) => (

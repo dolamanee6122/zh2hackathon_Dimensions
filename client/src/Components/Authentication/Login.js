@@ -116,7 +116,7 @@ const Login = ({setCreds}) => {
                 const info= await response.json();
                
                 if(response.status===200)
-                {
+                {   
                     // setMessage("Registered!!, Please Login")
                     setCreds({id:(selectedType==='MERCHANT'?info.merchantID:info.buyerID),
                     token:info.token,
