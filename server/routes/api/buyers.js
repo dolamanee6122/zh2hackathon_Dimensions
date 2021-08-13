@@ -3,6 +3,7 @@ const router = express.Router();
 const auth = require("../../middleware/auth");
 //Buyers model
 const Buyer = require("../../models/Buyer");
+const bcrypt = require("bcryptjs");
 
 const getInitialBalance = () => {
   return {
@@ -38,6 +39,36 @@ router.get("/:id", auth, async (req, res) => {
     const buyer = await Buyer.findById(id).select("-user.password");
     if (!buyer) return res.status(404).json({ message: "Invalid buyerID" });
     res.json({ message: "OK", buyer });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
+});
+
+
+// @route   POST /api/buyers/signin
+// @desc    Login for buyer
+// @access  Public
+router.post("/signin", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const buyerLogin = await Buyer.findOne({ "user.email": email });
+    if (
+      !buyerLogin ||
+      !(await bcrypt.compare(password, buyerLogin.user.password))
+    )
+      return res.status(404).json({ message: "Invalid credentials" });
+    const token = await buyerLogin.user.generateAuthToken(buyerLogin._id);
+    // buyerLogin.save();
+    // res.cookie("jwtoken", token, {
+    //   expires: new Date(Date.now() + 2589200000),
+    //   httpOnly: true,
+    // });
+    res.json({
+      message: "Signed In successfully",
+      buyerID: buyerLogin._id,
+      token,
+    });
   } catch (err) {
     console.log(`err`, err);
     res.status(500).json({ err });

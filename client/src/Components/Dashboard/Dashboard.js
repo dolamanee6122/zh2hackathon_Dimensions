@@ -134,7 +134,11 @@ export default function Dashboard() {
   const [selectedShop, setSelectedShop] = useState("all");
   const [stats, setStats] = useState();
 
-  const id = "61136f34480a693fb4d49453";
+  // const id = "61136f34480a693fb4d49453";
+
+  const idString = sessionStorage.getItem('userId');
+  const id = JSON.parse(idString);
+  console.log(`id in Dash---------------------------------------------------------------------`, id)
   const apiURL = BASE_URL + "merchants/" + id;
 
   console.log(apiURL);

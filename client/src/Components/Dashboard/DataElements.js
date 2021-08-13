@@ -1,7 +1,7 @@
-import { Grid, makeStyles, Paper } from '@material-ui/core';
+import { Fab, Grid, makeStyles, Paper } from '@material-ui/core';
 import React from 'react';
 import clsx from "clsx";
-
+import AddIcon from "@material-ui/icons/Add";
 import RecentTransactions from './RecentTransactions'
 import Requests from './Requests'
 import StatCards from './StatCards'
@@ -160,6 +160,9 @@ const DataElements = ({stats,request,id,accountType}) => {
               </Paper>
             </Grid>
           </Grid>
+        <Fab color="primary" aria-label="add" style={{position:"absolute", bottom:"24px", right:"48px"}}>
+            <AddIcon />
+        </Fab>
         </div>
     )
 }
