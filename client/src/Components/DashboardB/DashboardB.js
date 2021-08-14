@@ -16,7 +16,6 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import { mainListItems, secondaryListItems } from "../listItems";
 import BASE_URL from "../../baseURL";
-import DataElements from "./DataElements";
 import {
   Button,
   FormHelperText,
@@ -25,6 +24,7 @@ import {
   MenuItem,
   Select,
 } from "@material-ui/core";
+import DataElements from "./DataElements";
 
 const drawerWidth = 240;
 
@@ -118,7 +118,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Dashboard({handleLogout}) {
+export default function DashboardB({handleLogout}) {
   
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
@@ -129,97 +129,58 @@ export default function Dashboard({handleLogout}) {
     setOpen(false);
   };
 
-  const [merchantInfo, setMerchantInfo] = useState();
+  const [buyerInfo, setBuyerInfo] = useState();
   const [loading, setLoading] = useState(true);
   const [shops, setShops] = useState();
   const [request, setRequest] = useState();
-  const [selectedShop, setSelectedShop] = useState("all");
   const [stats, setStats] = useState();
-  const [trxns,setTrxns] =useState();
 
   // const id = "61136f34480a693fb4d49453";
 
   const idString = sessionStorage.getItem('userId');
   const id = JSON.parse(idString);
-  console.log(`id in Dash---------------------------------------------------------------------`, id)
-  const apiURL = BASE_URL + "merchants/" + id;
+  console.log(`id in DashB---------------------------------------------------------------------`, id)
+  const apiURL = BASE_URL + "buyers/" + id;
 
   console.log(apiURL);
-  async function fetchMerchant() {
+
+
+
+  async function fetchBuyer() {
     console.log("here");
     const response = await fetch(`${apiURL}`);
     const info = await response.json();
-    setMerchantInfo(info.merchant);
-    // console.log(`merchnatInfo`, merchantInfo)
-    setShops(info.merchant.shopList);
-    // setStats(info.merchant.user.balance);
-    await fetchStats(id, "merchant");
-    await fetchTransactions(id);
+    console.log(`info`, info);
+    setBuyerInfo(info.buyer);
+    await fetchStats(id, "buyer");
     await fetchRequests(id);
     setLoading(false);
   }
   async function fetchRequests(id) {
-    console.log("@request");
     const URL = BASE_URL + "request/" + id + "/?limit=3";
+    console.log("@request",URL);
     const response = await fetch(`${URL}`);
     const info = await response.json();
     console.log("Requests------------------->", info);
     setRequest(info.requests);
     setLoading(false);
   }
-  
-  async function fetchTransactions(id) {
-    console.log("@trn");
-    const URL = BASE_URL + "transaction/" + id + "/?limit=3";
-    const response = await fetch(`${URL}`);
-    const info = await response.json();
-    console.log("Trxn------------------->", info);
-    // setRequest(info.reque);
-    setTrxns(info.transactions);
-  }
 
   async function fetchStats(id, type) {
     console.log("from fetchStats");
-    const URL =
-      BASE_URL + "transaction/balanceanalytics/" + id + "/?type=" + type;
+    const URL =BASE_URL + "transaction/balanceanalytics/" + id + "/?type=" + type;
     console.log(`URL`, URL);
     const response = await fetch(`${URL}`);
     const info = await response.json();
     console.log("stats------------------->", info);
     setStats(info.balanceAnalytics);
   }
-  async function fetchShopDetails(id) {
-    console.log("@shopDetails");
-    const URL = BASE_URL + "shop/" + id;
-    console.log(`URL`, URL);
-    const response = await fetch(`${URL}`);
-    const info = await response.json();
-    console.log("shop------------------->", info);
-    setStats(info.shop.balance);
-    await fetchStats(id, "shop");
-    await fetchRequests(id);
-    setLoading(false);
-    //setMerchantInfo(info.merchant);
-    //setShops(info.merchant.shopList)
-  }
+
   useEffect(async () => {
     console.log("useEffece t Caked");
-    await fetchMerchant();
-    //await fetchRequests();
+    await fetchBuyer();
   }, []);
 
-  const handleShopChange = (e) => {
-    e.preventDefault();
-    setSelectedShop(e.target.value);
-    console.log(selectedShop);
-    if (e.target.value === "all") {
-      fetchStats(id, "merchant");
-    } else {
-      setLoading(true);
-      // const ShopID=selectedShop;
-      fetchShopDetails(e.target.value);
-    }
-  };
 
   return (
     <div>
@@ -288,35 +249,12 @@ export default function Dashboard({handleLogout}) {
             <Container maxWidth="lg" className={classes.container}>
               <div style={{ display: "flex" }}>
                 <h2 style={{ display: "flex-start" }}>
-                  Hi, {merchantInfo.user.firstName}
+                  Hi, {buyerInfo.user.firstName}
                 </h2>
-                <div style={{ marginLeft: "auto" }}>
-                  <InputLabel id="shop-dropdown">Shops</InputLabel>
-                  <Select
-                    labelId="shop-dropdown"
-                    value={selectedShop}
-                    onChange={handleShopChange}
-                  >
-                    <MenuItem value="all">
-                      <em>All Shops</em>
-                    </MenuItem>
-                    {shops.map((e) => {
-                      return (
-                        <MenuItem key={e.shopID} value={e.shopID}>
-                          {e.shopName}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                  <FormHelperText>
-                    Select to get Shop-wise analysis
-                  </FormHelperText>
-                </div>
               </div>
               <DataElements
                 stats={stats}
                 request={request}
-                trxns={trxns}
                 id={id}
                 accountType={"merchant"}
               />

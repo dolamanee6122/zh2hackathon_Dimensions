@@ -7,6 +7,7 @@ const Merchant = require("../../models/Merchant");
 const Shop = require("../../models/Shop");
 const Buyer = require("../../models/Buyer");
 const Request = require("../../models/Request");
+const auth = require("../../middleware/auth");
 
 // update balance of buyer for the current transaction
 const updateBalanceBuyer = (buyer, shopID, transaction, recordType, amount) => {
@@ -105,9 +106,9 @@ const updateBalance = (
 };
 
 // @route   POST /api/transaction/
-// @desc    do a new transaction with requestID
+// @desc    Do a new transaction with requestID
 // @access  Protected
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   //console.log(req.body);
   const { requestID, attributes } = req.body;
 
@@ -136,8 +137,11 @@ router.post("/", async (req, res) => {
     if (!merchant) return res.status(404).json({ message: "Invalid request" });
     const transaction = new Transaction({
       buyerID,
+      buyerName:buyer.user.firstName+" "+buyer.user.lastName, 
       shopID,
+      shopName:shop.shopName,
       merchantID,
+      merchantName:merchant.user.firstName+" "+merchant.user.lastName, 
       amount,
       paymentMode,
       recordType,
@@ -180,7 +184,7 @@ router.post("/", async (req, res) => {
 // @route   GET /api/transaction/id/{transactionID}
 // @desc    Get information for a transactionID
 // @access  Protected
-router.get("/id/:id", async (req, res) => {
+router.get("/id/:id", auth, async (req, res) => {
   const { id } = req.params;
 
   //TODO define and implement who have access to transaction
@@ -198,7 +202,7 @@ router.get("/id/:id", async (req, res) => {
 // @route   GET /api/transaction/{buyerID | shopID | merchantID}
 // @desc    Get all transaction details for merchant, shop or buyer
 // @access  Protected
-router.get("/:id/", async (req, res) => {
+router.get("/:id/", auth, async (req, res) => {
   const { id } = req.params;
 
   const { limit } = req.query;
@@ -263,16 +267,19 @@ const getBalanceAnalytics = async (objID, type, timeline) => {
   ]);
 
   let debit = 0,
-    credit = 0,
-    balance = 0;
+    credit = 0;
   balanceOfTimeline.forEach((e) => {
-    if (e._id == "DEBIT") debit += e.amount;
-    else credit += e.amount;
+    if (type == "buyer") {
+      if (e._id == "DEBIT") debit += e.amount;
+      else credit += e.amount;
+    } else {
+      if (e._id == "DEBIT") credit += e.amount;
+      else debit += e.amount;
+    }
   });
-  if (type == "buyer") balance = debit - credit;
-  else balance = credit - debit;
+  balance = credit - debit;
   return {
-    balance,
+    balance: credit - debit,
     debit,
     credit,
   };
@@ -281,7 +288,7 @@ const getBalanceAnalytics = async (objID, type, timeline) => {
 // @route   GET /api/transaction/balanceanalytics/{buyerID | shopID | merchantID}/?query=type
 // @desc    Get all balance(today,week,month,allTime)details for merchant, shop or buyer
 // @access  Protected
-router.get("/balanceanalytics/:id/", async (req, res) => {
+router.get("/balanceanalytics/:id/", auth, async (req, res) => {
   const { id } = req.params;
   const { type } = req.query;
   const objID = new mongoose.Types.ObjectId(id);

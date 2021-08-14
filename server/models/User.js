@@ -42,7 +42,6 @@ const UserSchema = new Schema(
   {
     salutation: {
       type: String,
-      required: true,
     },
     firstName: {
       type: String,
@@ -57,12 +56,10 @@ const UserSchema = new Schema(
     },
     dob: {
       type: Date,
-      required: true,
     },
     gender: {
       type: String,
       enum: ["Male", "Female"],
-      required: true,
     },
     email: {
       type: String,
@@ -84,7 +81,6 @@ const UserSchema = new Schema(
     },
     address: {
       type: AddressSchema,
-      required: true,
     },
     accountType: {
       type: String,

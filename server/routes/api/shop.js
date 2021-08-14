@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Shop = require("../../models/Shop");
-
+const auth = require("../../middleware/auth");
 const getInitialBalance = () => {
   return {
     balance: 0,
@@ -13,8 +13,9 @@ const getInitialBalance = () => {
 // @route   POST /api/shop/
 // @desc    Add a new shop under a merchant
 // @access  Protected
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { shopName, merchantID, address, rating } = req.body;
+  //TODO validate shop details first
   try {
     const merchant = await Merchant.findById(merchantID);
     if (!merchant) return res.status(404).json({ message: "Invalid merchant" });
@@ -29,7 +30,7 @@ router.post("/", async (req, res) => {
     merchant.shopList.push({ shopID: shop._id, shopName: shop.shopName });
     await shop.save();
     await merchant.save();
-    res.json({ message: "Shop Added", shop, merchant });
+    res.json({ message: "Shop Added", shop });
   } catch (err) {
     console.log(`err`, err);
     res.status(500).json({ err });
@@ -37,9 +38,9 @@ router.post("/", async (req, res) => {
 });
 
 // @route   GET /api/shop/{shopID}
-// @desc    get information of a particular shop
+// @desc    Get information of a particular shop
 // @access  Protected
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
   const { id } = req.params;
   try {
     const shop = await Shop.findById(id);
@@ -51,6 +52,18 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-//TODO
-router.post("/addRequest", async (req, res) => {});
+// @route   GET /api/shop/
+// @desc    Get names of all shop
+// @access  Protected
+router.get("/", auth, async (req, res) => {
+  try {
+    const shops = await Shop.find({}, { shopName: 1 });
+    if (!shops) return res.status(404).json({ message: "Invalid ShopID" });
+    res.json({ message: "OK", shops });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
+});
+
 module.exports = router;

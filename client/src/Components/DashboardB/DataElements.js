@@ -5,6 +5,7 @@ import AddIcon from "@material-ui/icons/Add";
 import RecentTransactions from './RecentTransactions'
 import Requests from './Requests'
 import StatCards from './StatCards'
+import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -98,7 +99,7 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
   
-const DataElements = ({stats,request,id,accountType,trxns}) => {
+const DataElements = ({stats,request,id,accountType}) => {
     
     console.log('dstat',stats)
     const classes = useStyles();
@@ -150,7 +151,7 @@ const DataElements = ({stats,request,id,accountType,trxns}) => {
             {/* Transaction */}
             <Grid item xs={12} md={10} lg={7}>
               <Paper className={requests}>
-                <RecentTransactions  trxns={trxns}/>
+                <RecentTransactions />
               </Paper>
             </Grid>
             {/*Request*/}
@@ -160,9 +161,12 @@ const DataElements = ({stats,request,id,accountType,trxns}) => {
               </Paper>
             </Grid>
           </Grid>
+        <Link to="/createrequest">
         <Fab color="primary" aria-label="add" style={{position:"absolute", bottom:"24px", right:"48px"}}>
             <AddIcon />
         </Fab>
+        </Link>
+        
         </div>
     )
 }

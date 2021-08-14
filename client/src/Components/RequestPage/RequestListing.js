@@ -16,10 +16,9 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import { mainListItems, secondaryListItems } from "../listItems";
 import BASE_URL from "../../baseURL";
-import { FormHelperText, InputLabel, LinearProgress, MenuItem , Select} from "@material-ui/core";
+import { Button, FormHelperText, InputLabel, LinearProgress, MenuItem, Select } from "@material-ui/core";
 import EachRequest from "../Dashboard/EachRequest";
 import { useLocation } from "react-router-dom";
-
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -112,10 +111,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function RequestListing(props) {
-  const location=useLocation();
-  const id=location.props.id.id;
-  console.log(`id`, id);
+export default function RequestListing({handleLogout}) {
+
+  const idString = sessionStorage.getItem('userId');
+  const id = JSON.parse(idString);
+
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -124,94 +124,95 @@ export default function RequestListing(props) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  const [loading,setLoading]=useState(true);
-  const [request,setRequest] =useState();
-  
+  const [loading, setLoading] = useState(true);
+  const [request, setRequest] = useState();
 
-  async function fetchRequests(id){
+
+  async function fetchRequests(id) {
     console.log("from fetchRequest from RequestListing");
-    const URL=BASE_URL+"request/"+id;
+    const URL = BASE_URL + "request/" + id;
     console.log(`URL`, URL);
     const response = await fetch(`${URL}`);
     const info = await response.json();
-    console.log("requests------------------->",info);
+    console.log("requests------------------->", info);
     setRequest(info.requests);
     setLoading(false);
   }
 
-  useEffect(async()=>{
-      await fetchRequests(id);
-      console.log(`request`, request)
-  },[])
+  useEffect(async () => {
+    await fetchRequests(id);
+    console.log(`request hai`, request)
+  }, [])
   return (
 
     <div>
       {/* {console.log(`merchantInfo`, merchantInfo)}
       {console.log(`shopList`, shops)} */}
-      {loading && <LinearProgress  />}
+      {loading && <LinearProgress />}
       {!loading && <div className={classes.root}>
-      <CssBaseline />
-      <AppBar
-        position="absolute"
-        className={clsx(classes.appBar, open && classes.appBarShift)}
-      >
-        <Toolbar className={classes.toolbar}>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            className={clsx(
-              classes.menuButton,
-              open && classes.menuButtonHidden
-            )}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            component="h1"
-            variant="h6"
-            color="inherit"
-            noWrap
-            className={classes.title}
-          >
-            Requests
-          </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        variant="permanent"
-        classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)
-        }}
-        open={open}
-      >
-        <div className={classes.toolbarIcon}>
-          <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </div>
-        <Divider />
-        <List>{mainListItems}</List>
-        <Divider />
-        <List>{secondaryListItems}</List>
-      </Drawer>
-      <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
-            {request.map((e)=>{
-                return <EachRequest data={e}/>
+        <CssBaseline />
+        <AppBar
+          position="absolute"
+          className={clsx(classes.appBar, open && classes.appBarShift)}
+        >
+          <Toolbar className={classes.toolbar}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              className={clsx(
+                classes.menuButton,
+                open && classes.menuButtonHidden
+              )}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography
+              component="h1"
+              variant="h6"
+              color="inherit"
+              noWrap
+              className={classes.title}
+            >
+              Requests
+            </Typography>
+            <IconButton color="inherit">
+              <Badge badgeContent={4} color="secondary">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+            <Button  variant="contained" color="secondary" onClick={handleLogout}>Logout</Button>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          variant="permanent"
+          classes={{
+            paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)
+          }}
+          open={open}
+        >
+          <div className={classes.toolbarIcon}>
+            <IconButton onClick={handleDrawerClose}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </div>
+          <Divider />
+          <List>{mainListItems}</List>
+          <Divider />
+          <List>{secondaryListItems}</List>
+        </Drawer>
+        <main className={classes.content}>
+          <div className={classes.appBarSpacer} />
+          <Container maxWidth="lg" className={classes.container}>
+            {request.map((e) => {
+              return <EachRequest data={e} />
             })}
-        </Container>
-      </main>
+          </Container>
+        </main>
 
-    </div>}
-    
+      </div>}
+
     </div>
   );
 }

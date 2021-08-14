@@ -3,7 +3,7 @@ const router = express.Router();
 const Shop = require("../../models/Shop");
 const Buyer = require("../../models/Buyer");
 const Request = require("../../models/Request");
-
+const auth = require("../../middleware/auth");
 const getInitialBalance = () => {
   return {
     balance: 0,
@@ -31,9 +31,9 @@ const addBuyerToShop = (shop, buyer) => {
 };
 
 // @route   POST /api/request/
-// @desc    create a request for doing a transaction
+// @desc    Create a request for doing a transaction
 // @access  Protected
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { shopID, buyerID, amount, recordType, paymentMode } = req.body;
 
   try {
@@ -41,10 +41,10 @@ router.post("/", async (req, res) => {
     const shop = await Shop.findById(shopID);
     if (!buyer || !shop)
       return res.status(404).json({ message: "Invalid request" });
-    const {merchantID,merchantName}=shop;
-    const merchant =Merchant.findById(merchantID);
+    const { merchantID, merchantName } = shop;
+    const merchant = Merchant.findById(merchantID);
     const { firstName, lastName, address } = buyer.user;
-    const {rating} =buyer;
+    const { rating } = buyer;
     const { shopName } = shop;
     const buyerName = firstName + " " + lastName;
     let balanceShopWise = shop.balanceUserWise.find(
@@ -75,7 +75,7 @@ router.post("/", async (req, res) => {
         shopID,
         shopName,
       },
-      merchant:{
+      merchant: {
         merchantID,
         merchantName,
       },
@@ -97,7 +97,7 @@ router.post("/", async (req, res) => {
 // @route   POST /api/request/reject
 // @desc    Rejecting a pending transaction request
 // @access  Protected
-router.post("/reject", async (req, res) => {
+router.post("/reject", auth, async (req, res) => {
   const { requestID, remarks } = req.body;
   try {
     const request = await Request.findById(requestID);
@@ -116,20 +116,24 @@ router.post("/reject", async (req, res) => {
   }
 });
 
-
 // @route   GET /api/request/{buyerID | shopID | merchantID}
 // @desc    Get all Request details for merchant, shop or buyer
 // @access  Protected
-
-router.get("/:id/", async (req, res) => {   
+router.get("/:id/", auth, async (req, res) => {
   const { id } = req.params;
- 
-  const{limit}=req.query;
- 
+
+  const { limit } = req.query;
+
   try {
     const requests = await Request.find({
-      $or: [{ "buyer.buyerID": id }, {"shop.shopID": id },{"merchant.merchantID": id }],
-    }).sort({_id:-1}).limit(parseInt(limit));
+      $or: [
+        { "buyer.buyerID": id },
+        { "shop.shopID": id },
+        { "merchant.merchantID": id },
+      ],
+    })
+      .sort({ _id: -1 })
+      .limit(parseInt(limit));
     if (!requests)
       return res.status(404).json({ message: "No Requests found" });
     res.json({ message: "OK", requests });
