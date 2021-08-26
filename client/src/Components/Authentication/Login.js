@@ -38,9 +38,9 @@ const initialValues={
     password:"",
     pan:"",
     dob:{
-        day:"",
-        month:"",
-        year:""
+        day:"1",
+        month:"1",
+        year:"2014"
     }
 }
 
@@ -101,49 +101,50 @@ const Login = ({setCreds}) => {
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({user:{firstName:`${values.firstName}`,
-                                    lastName:`${values.lastName}`, 
-                                    email:`${values.email}`,
-                                    password:`${values.password}`,
-                                    mobileNo:`${values.phone}`,
-                                    accountType:`${selectedType.toLowerCase()}`
-                                 }})
-    //     body: JSON.stringify({"fusionUser": {
-    //     "ifiID": "140793",
-    //     "spoolID": "3deb5a70-311c-11ea-978f-2e728ce88125",
-    //     "individualType": "RAH",
-    //     "firstName": `${values.firstName}`,
-    //     "dob": `${values.dob}`,
-    //     "kycDetails": {
-    //         "kycStatus": "MINIMAL",
-    //         "kycStatusPostExpiry": "KYC_EXPIRED",
-    //         "kycAttributes": {},
-    //         "authData": {
-    //             "PAN": `${values.pan}`
-    //         },
-    //         "authType": "PAN"
-    //     },
-    //     "vectors": [
-    //         {
-    //             "type": "e",
-    //             "value": `${values.email}` ,
-    //             "isVerified": true
-    //         }
-    //     ]
-    // },
-    // "user": {
-        // "firstName": `${values.firstName}`,
-    //     "email": `${values.email}`,
-    //     "password":`${values.password}` ,
-    //     "accountType": `${selectedType.toLowerCase()}`
-    // }})
+                // body: JSON.stringify({user:{firstName:`${values.firstName}`,
+                //                     lastName:`${values.lastName}`, 
+                //                     email:`${values.email}`,
+                //                     password:`${values.password}`,
+                //                     mobileNo:`${values.phone}`,
+                //                     accountType:`${selectedType.toLowerCase()}`
+                //                  }})
+        body: JSON.stringify({"fusionUser": {
+        "ifiID": "140793",
+        "spoolID": "3deb5a70-311c-11ea-978f-2e728ce88125",
+        "individualType": "RAH",
+        "firstName": `${values.firstName}`,
+        "dob": {"day":`${values.dob.day}`, "month":`${values.dob.month}`, "year":`${values.dob.year}`},
+        "kycDetails": {
+            "kycStatus": "MINIMAL",
+            "kycStatusPostExpiry": "KYC_EXPIRED",
+            "kycAttributes": {},
+            "authData": {
+                "PAN": `${values.pan}`
+            },
+            "authType": "PAN"
+        },
+        "vectors": [
+            {
+                "type": "e",
+                "value": `${values.email}` ,
+                "isVerified": true
+            }
+        ]
+    },
+    "user": {
+        "firstName": `${values.firstName}`,
+        "email": `${values.email}`,
+        "password":`${values.password}` ,
+        "accountType": `${selectedType.toLowerCase()}`
+    }})
             };
-            console.log(`requestOptions.body`, requestOptions.body)
+            console.log(`requestOptions.body`, requestOptions.body, typeof(requestOptions.body))
              fetch(`${URL}`,requestOptions)
                 .then((response)=>{
                     console.log(`response`, response);
                     if(response.status===200)
                     {
+                        // console.log(`response`, response)
                         setMessage("Registered!!, Please Login")
                     }
                     else
