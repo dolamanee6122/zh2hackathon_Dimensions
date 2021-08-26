@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useCreds } from './Components/Authentication/useCreds';
 import Dashboard from './Components/Dashboard/Dashboard';
 import CreateRequest from './Components/CreateRequest/CreateRequest';
+import AddShop from './Components/AddShop/AddShop';
 import Transactions from './Components/Transaction/Transactions';
 
 
@@ -53,6 +54,11 @@ function App() {
               <CreateRequest/>
             </Route>
         } 
+        {accountType === "MERCHANT" && (
+            <Route path="/addshop">
+              <AddShop />
+            </Route>
+        )}
        <Route 
         path="/requests"
         render={(props) => (

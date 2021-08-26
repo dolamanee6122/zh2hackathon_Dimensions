@@ -228,7 +228,7 @@ export default function AddShop(params) {
             noWrap
             className={classes.title}
           >
-            Create Request
+            Add Shop
           </Typography>
           <IconButton color="inherit">
             <Badge badgeContent={4} color="secondary">
