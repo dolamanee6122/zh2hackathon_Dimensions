@@ -2,12 +2,14 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const moment = require("moment");
+const requestHTTP = require("request");
 const Transaction = require("../../models/Transaction");
 const Merchant = require("../../models/Merchant");
 const Shop = require("../../models/Shop");
 const Buyer = require("../../models/Buyer");
 const Request = require("../../models/Request");
 const auth = require("../../middleware/auth");
+const { FUSION_BASE_URL, IFI_ID, X_ZETA_AUTH_TOKEN } = require("config");
 
 // update balance of buyer for the current transaction
 const updateBalanceBuyer = (buyer, shopID, transaction, recordType, amount) => {
@@ -111,22 +113,22 @@ const updateBalance = (
 router.post("/", auth, async (req, res) => {
   //console.log(req.body);
   const { requestID, attributes } = req.body;
+  let flag = 0;
 
   try {
     const request = await Request.findById(requestID);
     if (!request) return res.status(404).json({ message: "Invalid request" });
-
-    if (request.status !== "PENDING")
-      return res.json({ message: "Transaction already done" });
+    //if (request.status !== "PENDING")
+    //return res.json({ message: "Transaction already done" });
     const {
       buyer: { buyerID },
       shop: { shopID },
       amount,
       paymentMode,
       recordType,
+      remarks,
     } = request;
     currency = "INR";
-
     const buyer = await Buyer.findById(buyerID);
     const shop = await Shop.findById(shopID);
 
@@ -135,13 +137,54 @@ router.post("/", auth, async (req, res) => {
     const { merchantID } = shop;
     const merchant = await Merchant.findById(merchantID);
     if (!merchant) return res.status(404).json({ message: "Invalid request" });
+
+    // Do A2A transfer through FUSION API
+    if (recordType == "DEBIT") {
+      const a2aTransfer = async () => {
+        const requestOptions = {
+          url: FUSION_BASE_URL + "/ifi/" + IFI_ID + "/transfers/",
+          method: "POST",
+          json: true,
+          headers: {
+            "Content-Type": "application/json",
+            "X-Zeta-AuthToken": X_ZETA_AUTH_TOKEN,
+          },
+          body: {
+            requestID,
+            amount: {
+              currency: "INR",
+              amount,
+            },
+            transferCode: "ATLAS_P2M_AUTH",
+            debitAccountID: buyer.accountID,
+            creditAccountID: shop.accountID,
+            transferTime: Date.now(),
+            remarks: remarks || "NULL",
+            attributes,
+          },
+        };
+        requestHTTP(requestOptions, async (err, response, body) => {
+          if (err) {
+            flag = 1;
+            return res.json({ err });
+          }
+          const { statusCode } = response;
+          if (statusCode != 200) {
+            flag = 1;
+            return res.status(statusCode).json({ ...body });
+          }
+        });
+      };
+      await a2aTransfer();
+    }
+
     const transaction = new Transaction({
       buyerID,
-      buyerName:buyer.user.firstName+" "+buyer.user.lastName, 
+      buyerName: buyer.user.firstName + " " + buyer.user.lastName,
       shopID,
-      shopName:shop.shopName,
+      shopName: shop.shopName,
       merchantID,
-      merchantName:merchant.user.firstName+" "+merchant.user.lastName, 
+      merchantName: merchant.user.firstName + " " + merchant.user.lastName,
       amount,
       paymentMode,
       recordType,
@@ -166,6 +209,7 @@ router.post("/", auth, async (req, res) => {
     await merchant.save();
     await transaction.save();
 
+    if (flag) return;
     //TODO update the rating of buyer/shop/merchant if required
     return res.json({
       status: "Payment Successful...",
@@ -177,7 +221,8 @@ router.post("/", auth, async (req, res) => {
     });
   } catch (err) {
     console.log(`err`, err);
-    res.status(500).json({ err });
+    if (flag) return;
+    return res.status(500).json({ err });
   }
 });
 

@@ -24,7 +24,7 @@ function App() {
   const handleLogout = (e) => {
     e.preventDefault();
     window.location.reload(true);
-    sessionStorage.clear();
+    localStorage.clear();
   }
 
   return (
@@ -48,28 +48,30 @@ function App() {
               )}
             />
           }
-          {accountType === 'BUYER' &&
+          
             <Route path="/createrequest">
               <CreateRequest/>
             </Route>
-        } 
-        {accountType === "MERCHANT" && (
+        
+      
             <Route path="/addshop">
               <AddShop />
             </Route>
-        )}
+        
        <Route 
         path="/requests"
         render={(props) => (
           <RequestListing {...props} handleLogout={handleLogout} />
         )}
         />
-       
+        <Route path='/github' component={() => { 
+           window.location.href = 'https://github.com/dolamanee6122/Dimensions'; 
+           return null;
+        }}/>
+
          <Route path="/transactions">
               <Transactions/>
             </Route>
-          
-  
           <Route path="/profile">
             <Profile />
           </Route>

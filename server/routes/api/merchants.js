@@ -51,6 +51,8 @@ router.post("/", async (req, res) => {
   const { fusionUser, user } = req.body;
   //TODO validate merchant details before registering
   user.balance = getInitialBalance();
+  user.firstName = fusionUser.firstName;
+  user.lastName = fusionUser.lastName;
   try {
     const existingMerchant = await Merchant.findOne({
       "user.email": user.email,

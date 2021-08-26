@@ -256,7 +256,7 @@ export default function DashboardB({handleLogout}) {
                 stats={stats}
                 request={request}
                 id={id}
-                accountType={"merchant"}
+                accountType={"buyer"}
               />
             </Container>
           </main>

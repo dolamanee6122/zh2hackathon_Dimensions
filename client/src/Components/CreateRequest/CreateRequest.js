@@ -200,7 +200,7 @@ export default function CreateRequest(params) {
       .then((data) => {
         alert("Request done..wait for merchant to accept");
         //redirecting to dashboard page
-        window.location.href = "/";
+        // window.location.href = "/";
       })
       .catch((err) => {
         alert("Failed to request");
