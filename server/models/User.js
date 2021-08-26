@@ -3,17 +3,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require("bcryptjs");
 const config = require("config");
-// Address Schema
-const AddressSchema = new Schema(
-  {
-    line1: String,
-    line2: String,
-    city: String,
-    state: String,
-    pinCode: { type: Number, required: true },
-  },
-  { _id: false }
-);
 
 // Balance Schema
 const BalanceSchema = new Schema(
@@ -40,26 +29,14 @@ const BalanceSchema = new Schema(
 //Create Schema
 const UserSchema = new Schema(
   {
-    salutation: {
+    fusionID: {
       type: String,
+      required: true,
+      unique: true,
     },
     firstName: {
       type: String,
       required: true,
-    },
-    middleName: {
-      type: String,
-    },
-    lastName: {
-      type: String,
-      required: true,
-    },
-    dob: {
-      type: Date,
-    },
-    gender: {
-      type: String,
-      enum: ["Male", "Female"],
     },
     email: {
       type: String,
@@ -70,17 +47,7 @@ const UserSchema = new Schema(
     password: {
       type: String,
       required: true,
-    },
-    profilePicURL: {
-      type: String,
-    },
-    mobileNo: {
-      type: Number,
-      required: true,
-      unique: true,
-    },
-    address: {
-      type: AddressSchema,
+      select: false,
     },
     accountType: {
       type: String,
@@ -91,14 +58,6 @@ const UserSchema = new Schema(
       type: BalanceSchema,
       required: true,
     },
-    tokens: [
-      {
-        token: {
-          type: String,
-          required: true,
-        },
-      },
-    ],
   },
   { _id: false }
 );
@@ -125,7 +84,6 @@ UserSchema.methods.generateAuthToken = async function (id) {
 };
 
 module.exports = {
-  AddressSchema,
   BalanceSchema,
   UserSchema,
 };

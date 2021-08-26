@@ -1,25 +1,18 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const AddressSchema = require("./User");
+const { BalanceSchema } = require("./User");
 
-// Balance Schema
-const BalanceSchema = new Schema({
-  balance: {
-    type: Number,
-    required: true,
-    default: 0,
+// Address Schema
+const AddressSchema = new Schema(
+  {
+    line1: String,
+    line2: String,
+    city: String,
+    state: String,
+    pinCode: { type: Number, required: true },
   },
-  credit: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  debit: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-});
+  { _id: false }
+);
 
 const shopSchema = new Schema(
   {
@@ -32,6 +25,10 @@ const shopSchema = new Schema(
       required: true,
     },
     merchantName: {
+      type: String,
+      required: true,
+    },
+    accountID: {
       type: String,
       required: true,
     },
