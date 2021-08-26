@@ -129,8 +129,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Transactions(props) {
     const classes = useStyles();
-    const id = JSON.parse(sessionStorage.getItem("userId"));
-    const accountType = JSON.parse(sessionStorage.getItem("accountType"));
+    const id = JSON.parse(localStorage.getItem("userId"));
+    const accountType = JSON.parse(localStorage.getItem("accountType"));
     // console.log(id)
     const [open, setOpen] = React.useState(true);
     const handleDrawerOpen = () => {

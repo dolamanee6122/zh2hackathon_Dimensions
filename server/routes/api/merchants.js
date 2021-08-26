@@ -17,6 +17,33 @@ const getInitialBalance = () => {
   };
 };
 
+
+
+// @route   POST /api/merchants/signin
+// @desc    Login for merchant
+// @access  Public
+router.post("/signin", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const merchantLogin = await Merchant.findOne({ "user.email": email });
+    console.log("merchnat ppppppppppas",merchantLogin);
+    // // if (
+    // //   !merchantLogin ||
+    // //   !(await bcrypt.compare(password, merchantLogin.user.password))
+    // // )
+    //   return res.status(404).json({ message: "Invalid credentials" });
+    const token = await merchantLogin.user.generateAuthToken(merchantLogin._id);
+    res.json({
+      message: "Signed In successfully",
+      merchantID: merchantLogin._id,
+      token,
+    });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
+});
+
 // @route   POST /api/merchants
 // @desc    register a new merchants
 // @access  Public
@@ -97,30 +124,6 @@ router.get("/:id", auth, async (req, res) => {
   }
 });
 
-// @route   POST /api/merchants/signin
-// @desc    Login for merchant
-// @access  Public
-router.post("/signin", async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const merchantLogin = await Merchant.findOne({ "user.email": email });
-    console.log("merchnat ppppppppppas",merchantLogin);
-    // // if (
-    // //   !merchantLogin ||
-    // //   !(await bcrypt.compare(password, merchantLogin.user.password))
-    // // )
-    //   return res.status(404).json({ message: "Invalid credentials" });
-    const token = await merchantLogin.user.generateAuthToken(merchantLogin._id);
-    res.json({
-      message: "Signed In successfully",
-      merchantID: merchantLogin._id,
-      token,
-    });
-  } catch (err) {
-    console.log(`err`, err);
-    res.status(500).json({ err });
-  }
-});
 
 //TODO create a middleware for validating merchant
 validateMerchant = (merchant) => {

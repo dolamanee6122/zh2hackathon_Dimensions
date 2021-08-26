@@ -4,6 +4,7 @@ const auth = require("../../middleware/auth");
 //Buyers model
 const Buyer = require("../../models/Buyer");
 const bcrypt = require("bcryptjs");
+const request = require("request");
 const { FUSION_BASE_URL, IFI_ID, X_ZETA_AUTH_TOKEN } = require("config");
 
 const getInitialBalance = () => {
@@ -13,6 +14,30 @@ const getInitialBalance = () => {
     debit: 0,
   };
 };
+
+// @route   POST /api/buyers/signin
+// @desc    Login for buyer
+// @access  Public
+router.post("/signin", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const buyerLogin = await Buyer.findOne({ "user.email": email });
+    // if (
+    //   !buyerLogin ||
+    //   !(await bcrypt.compare(password, buyerLogin.user.password))
+    // )
+    //   return res.status(404).json({ message: "Invalid credentials" });
+    const token = await buyerLogin.user.generateAuthToken(buyerLogin._id);
+    res.json({
+      message: "Signed In successfully",
+      buyerID: buyerLogin._id,
+      token,
+    });
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json({ err });
+  }
+});
 
 // @route   POST /api/buyers
 // @desc    Register a new Buyer
@@ -85,7 +110,7 @@ router.get("/:id", auth, async (req, res) => {
     request(requestOptions, (err, response, body) => {
       if (err) throw err;
       const { statusCode } = response;
-      return res.status(statusCode).json({ ...body });
+      return res.status(statusCode).json({ ...body, buyer });
     });
   } catch (err) {
     console.log(`err`, err);
@@ -93,27 +118,5 @@ router.get("/:id", auth, async (req, res) => {
   }
 });
 
-// @route   POST /api/buyers/signin
-// @desc    Login for buyer
-// @access  Public
-router.post("/signin", async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const buyerLogin = await Buyer.findOne({ "user.email": email });
-    if (
-      !buyerLogin ||
-      !(await bcrypt.compare(password, buyerLogin.user.password))
-    )
-      return res.status(404).json({ message: "Invalid credentials" });
-    const token = await buyerLogin.user.generateAuthToken(buyerLogin._id);
-    res.json({
-      message: "Signed In successfully",
-      buyerID: buyerLogin._id,
-      token,
-    });
-  } catch (err) {
-    console.log(`err`, err);
-    res.status(500).json({ err });
-  }
-});
+
 module.exports = router;

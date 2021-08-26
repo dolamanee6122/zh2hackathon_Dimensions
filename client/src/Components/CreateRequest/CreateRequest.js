@@ -123,10 +123,10 @@ const useStyles = makeStyles((theme) => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
-    minWidth: 227,
+    minWidth: 245,
   },
   formControl: {
-    minWidth: 227,
+    minWidth: 245,
   },
   selectEmpty: {
     marginTop: theme.spacing(2),
@@ -135,7 +135,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CreateRequest(params) {
   //const BASE_URL = "http://localhost:5000";
-  const [shopID, setShopID] = useState("dummyID");
+  const [shopID, setShopID] = useState("none");
   const [shopName, setShopName] = useState("dummy");
   const [amount, setAmount] = useState(0);
   const [recordType, setRecordType] = useState("");
@@ -181,7 +181,7 @@ export default function CreateRequest(params) {
   const sendRequest = (e) => {
     e.preventDefault();
     const request = {
-      buyerID: localStorage.getItem("id") || "61123257a49bb59034d70b86",
+      buyerID: JSON.parse(localStorage.getItem("userId")),
       shopID,
       amount,
       recordType,
@@ -293,8 +293,10 @@ export default function CreateRequest(params) {
         <Container maxWidth="lg" className={classes.container}>
           <div className="container">
             <form onSubmit={sendRequest}>
-              <FormControl variant="outlined" className={classes.formControl}>
-                <InputLabel id="demo-simple-select-outlined-label">
+              <FormControl variant="outlined" className={classes.formControl} 
+                style={{textAlign:"left"}}
+              >
+              <InputLabel id="demo-simple-select-outlined-label">
                   Select Shop
                 </InputLabel>
                 <Select
@@ -303,7 +305,8 @@ export default function CreateRequest(params) {
                   onChange={selectShop}
                   label="Select Shop"
                 >
-                  <MenuItem value="">
+                 
+                  <MenuItem value="none">
                     <em>None</em>
                   </MenuItem>
                   {info.map((shop) => {
@@ -315,8 +318,9 @@ export default function CreateRequest(params) {
                   })}
                 </Select>
               </FormControl>
-              <FormControl
-                style={{ display: "block", margin: "10px 0 10px 0" }}
+              { shopID !== "none" && <>
+              <FormControl 
+                style={{ display: "block", margin: "10px 0 10px 0",  }}
               >
                 <TextField
                   id="outlined-basic"
@@ -382,6 +386,8 @@ export default function CreateRequest(params) {
               >
                 Send Request
               </Button>
+              </>
+              }
             </form>
           </div>
         </Container>
