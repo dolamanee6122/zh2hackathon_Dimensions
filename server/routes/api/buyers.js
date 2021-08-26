@@ -1,10 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("../../middleware/auth");
+const request = require("request");
 //Buyers model
 const Buyer = require("../../models/Buyer");
 const bcrypt = require("bcryptjs");
-const { FUSION_BASE_URL, IFI_ID, X_ZETA_AUTH_TOKEN } = require("config");
+const {
+  FUSION_BASE_URL,
+  IFI_ID,
+  BUNDLE_ID,
+  X_ZETA_AUTH_TOKEN,
+} = require("config");
 
 const getInitialBalance = () => {
   return {
@@ -21,6 +27,8 @@ router.post("/", async (req, res) => {
   const { fusionUser, user } = req.body;
   //TODO validate buyer details before registering
   user.balance = getInitialBalance();
+  user.firstName = fusionUser.firstName;
+  user.lastName = fusionUser.lastName;
   try {
     const existingBuyer = await Buyer.findOne({
       "user.email": user.email,
@@ -46,9 +54,41 @@ router.post("/", async (req, res) => {
         const { status, individualID } = body;
         if (status == "APPROVED") {
           user.fusionID = individualID;
-          const buyer = new Buyer({ user });
-          await buyer.save();
-          res.json({ ...body, buyerID: buyer._id });
+
+          //Issue a Bundle
+          const { fusionID, firstName } = user;
+          const requestOptions = {
+            url:
+              FUSION_BASE_URL +
+              "/ifi/" +
+              IFI_ID +
+              "/bundles/" +
+              BUNDLE_ID +
+              "/issueBundle",
+            method: "POST",
+            json: true,
+            headers: {
+              "Content-Type": "application/json",
+              "X-Zeta-AuthToken": X_ZETA_AUTH_TOKEN,
+            },
+            body: {
+              accountHolderID: fusionID,
+              name: firstName + "_Bundle",
+            },
+          };
+          request(requestOptions, async (err, response, body) => {
+            if (err) throw err;
+            const { statusCode } = response;
+            //console.log(`body`, body);
+            if (statusCode == 200) {
+              const { accountID } = body.accounts[0];
+              const buyer = new Buyer({ user, accountID });
+              await buyer.save();
+              res.json({ ...body, buyerID: buyer._id });
+            } else {
+              return res.status(statusCode).json({ ...body });
+            }
+          });
         } else {
           res.json({ ...body });
         }
