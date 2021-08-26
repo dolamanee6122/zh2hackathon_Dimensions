@@ -176,7 +176,7 @@ export default function AddShop(params) {
       .then((data) => {
         alert("Shop Added");
         //redirecting to dashboard page
-        window.location.href='/addshop';
+        // window.location.href='/addshop';
       })
       .catch((err) => {
         alert("Failed to add Shop");
