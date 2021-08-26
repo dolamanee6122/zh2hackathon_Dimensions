@@ -58,7 +58,7 @@ router.post("/", auth, async (req, res) => {
         const shop = new Shop({
           shopName,
           merchantID,
-          merchantName: merchant.user.firstName + " " + merchant.user.lastName,
+          merchantName: merchant.user.firstName,
           accountID,
           address,
           rating,

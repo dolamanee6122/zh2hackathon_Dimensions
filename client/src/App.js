@@ -7,21 +7,21 @@ import { useState } from 'react';
 import { useCreds } from './Components/Authentication/useCreds';
 import Dashboard from './Components/Dashboard/Dashboard';
 import CreateRequest from './Components/CreateRequest/CreateRequest';
+import AddShop from './Components/AddShop/AddShop';
 import Transactions from './Components/Transaction/Transactions';
-
-
+import Profile from './Components/Profile/Profile';
 
 function App() {
   const { creds, setCreds } = useCreds();
   // const creds=getCreds();
-  const id= creds.id;
-  const token =creds.token;
-  const accountType=creds.accountType;
-  if(!token){
-    return <Login setCreds={setCreds}/>
+  const id = creds.id;
+  const token = creds.token;
+  const accountType = creds.accountType;
+  if (!token) {
+    return <Login setCreds={setCreds} />
   }
 
-  const handleLogout=(e)=>{
+  const handleLogout = (e) => {
     e.preventDefault();
     window.location.reload(true);
     sessionStorage.clear();
@@ -29,43 +29,55 @@ function App() {
 
   return (
     <div className="App">
-     <Router>
-      <Switch>
-        { accountType==='BUYER' &&
-            <Route 
-            exact path="/"
-            render={(props) => (
-            <DashboardB {...props} handleLogout={handleLogout} /> 
-            )}
+      <Router>
+        <Switch>
+          {accountType === 'BUYER' &&
+            <Route
+              exact path="/"
+              render={(props) => (
+                <DashboardB {...props} handleLogout={handleLogout} />
+              )}
             />
-            
-        } 
-         { accountType==='MERCHANT' &&
-            <Route 
-            exact path="/"
-            render={(props) => (
-            <Dashboard {...props} handleLogout={handleLogout} /> 
-            )}
+
+          }
+          {accountType === 'MERCHANT' &&
+            <Route
+              exact path="/"
+              render={(props) => (
+                <Dashboard {...props} handleLogout={handleLogout} />
+              )}
             />
-        } 
-        { accountType==='BUYER' &&
+          }
+          {accountType === 'BUYER' &&
             <Route path="/createrequest">
               <CreateRequest/>
             </Route>
         } 
+        {accountType === "MERCHANT" && (
+            <Route path="/addshop">
+              <AddShop />
+            </Route>
+        )}
        <Route 
         path="/requests"
         render={(props) => (
           <RequestListing {...props} handleLogout={handleLogout} />
         )}
         />
+       
          <Route path="/transactions">
               <Transactions/>
             </Route>
-      </Switch>
-    </Router>
+          
+  
+          <Route path="/profile">
+            <Profile />
+          </Route>
+        </Switch>
+      </Router>
     </div>
   );
 }
 
 export default App;
+     

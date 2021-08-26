@@ -1,30 +1,27 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Box from "@material-ui/core/Box";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import Transaction from './Transaction'
 import clsx from "clsx";
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Divider from '@material-ui/core/Divider';
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import { mainListItems, secondaryListItems } from "../listItems";
+import { mainListItems, secondaryListItems } from "./../listItems";
 import BASE_URL from '../../baseURL';
 import { LinearProgress, Select } from "@material-ui/core";
-
+import './Profile.css';
+import Rating from '@material-ui/lab/Rating';
+import Box from '@material-ui/core/Box';
+import EditIcon from '@material-ui/icons/Edit';
 const useRowStyles = makeStyles({
     root: {
         "& > *": {
@@ -127,11 +124,28 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+
+
+const fetchName = async () => {
+    try {
+        const id = JSON.parse(sessionStorage.getItem("userId"));
+        const accountType = JSON.parse(sessionStorage.getItem("accountType"));
+        const res = await fetch(BASE_URL + accountType + "s/" + id);
+        const data = await res.json();
+        // console.log(data.merchant.user);
+        if (accountType === "MERCHANT")
+            return data.merchant.user.firstName + " " + data.merchant.user.lastName;
+        return data.buyer.user.firstName + " " + data.buyer.user.lastName;
+    }
+    catch {
+        //console.log("error in name");
+        window.location.href = "/";
+    }
+}
+
 export default function Transactions(props) {
+    const [value, setValue] = React.useState(2);
     const classes = useStyles();
-    const id = JSON.parse(localStorage.getItem("userId"));
-    const accountType = JSON.parse(localStorage.getItem("accountType"));
-    // console.log(id)
     const [open, setOpen] = React.useState(true);
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -140,17 +154,6 @@ export default function Transactions(props) {
         setOpen(false);
     };
     const [loading, setLoading] = useState(false);
-    const [rows, setRows] = useState([]);
-
-
-    useEffect(async () => {
-        const URL = BASE_URL + "transaction/" + id;
-        const res = await fetch(URL);
-        const data = await res.json();
-        console.log("hello", data.transactions);
-        setRows(data.transactions);
-    }, [])
-
 
     return (
         <div>
@@ -181,8 +184,9 @@ export default function Transactions(props) {
                             noWrap
                             className={classes.title}
                         >
-                            Transactions
+                            Profile
                         </Typography>
+                        <EditIcon style={{ marginRight: "3px" }} />
                     </Toolbar>
                 </AppBar>
                 <Drawer
@@ -202,31 +206,42 @@ export default function Transactions(props) {
                     <Divider />
                     <List>{secondaryListItems}</List>
                 </Drawer>
-                <main className={classes.content}>
-                    <div className={classes.appBarSpacer} />
-                    <Box m={9}>
-                        <TableContainer component={Paper}>
-                            <Table aria-label="collapsible table">
-                                <TableHead>
-                                    <TableRow style={{ backgroundColor: "#3f51b5" }}>
-                                        <TableCell />
-                                        <TableCell style={{ fontWeight: "700", color: "white" }}>Date(Value Date)</TableCell>
-                                        <TableCell style={{ fontWeight: "700", color: "white" }} align="center">{accountType === "MERCHANT" ? `Buyer` : `Merchant`}</TableCell>
-                                        <TableCell style={{ fontWeight: "700", color: "white" }} align="center">Shop</TableCell>
-                                        <TableCell style={{ fontWeight: "700", color: "white" }} align="center">Mode of Payment</TableCell>
-                                        <TableCell style={{ fontWeight: "700", color: "white" }} align="center">Debit/Credit</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody >
-                                    {rows.map((row) => (
-                                        <Transaction key={row.key} row={row} />
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Box>
-                </main>
+                <div className="proContainer" >
+                    <div className="div1">
+                        <div style={{ display: "flex" }}>
+                            <div className="imgCard">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBwgu1A5zgPSvfE83nurkuzNEoXs9DMNr8Ww&usqp=CAU" alt="" />
+                            </div>
+                        </div>
+                        <Box component="fieldset" mb={3} borderColor="transparent">
+                            <Typography component="legend" align="left" > <Rating style={{ color: "#3f51b5" }} name="read-only" value={value} readOnly /></Typography>
 
+                        </Box>
+                        <div>
+                            <h4>Gauravi</h4>
+                            <h4>Dob:-12/09/2021</h4>
+                            <h4>ID:2187454uydgawygayur8228</h4>
+                        </div>
+                    </div>
+
+                    <div className="div2">
+                        <ul>
+                            <li>
+                                <Typography align="left" variant="p"  >
+                                    Address
+                                </Typography>
+                                <Typography align="left" component="legend" >
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui quas nostrum blanditiis, minus illo debitis nulla nihil rerum dolorem nemo sequi molestias fugit ad ab. Nemo illum optio placeat sapiente?
+                                </Typography>
+                            </li>
+                            <li>
+                                <Typography align="left" variant="p"  >
+                                    Address
+                                </Typography>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>}
 
         </div >

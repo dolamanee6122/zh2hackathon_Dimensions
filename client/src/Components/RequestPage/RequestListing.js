@@ -113,7 +113,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function RequestListing({handleLogout}) {
 
-  const idString = sessionStorage.getItem('userId');
+  const idString = localStorage.getItem('userId');
   const id = JSON.parse(idString);
 
   const classes = useStyles();

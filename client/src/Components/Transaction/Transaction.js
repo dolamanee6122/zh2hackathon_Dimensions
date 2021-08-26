@@ -23,7 +23,7 @@ const useRowStyles = makeStyles({
 });
 const fetchName = async (row, accountType) => {
   try {
-    const id = JSON.parse(sessionStorage.getItem("userId"));
+    const id = JSON.parse(localStorage.getItem("userId"));
     const res = await fetch(BASE_URL + accountType + "s/" + id);
     const data = await res.json();
     // console.log(data.merchant.user);
@@ -66,7 +66,7 @@ const getColor = (row, accountType) => {
 }
 const Transaction = (props) => {
   const { row } = props;
-  const accountType = JSON.parse(sessionStorage.getItem("accountType"));
+  const accountType = JSON.parse(localStorage.getItem("accountType"));
   const [name, setName] = useState("");
   const [shopName, setShopName] = useState("");
   const [color, setColor] = useState("")

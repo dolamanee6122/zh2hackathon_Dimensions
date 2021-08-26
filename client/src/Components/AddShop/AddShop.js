@@ -29,8 +29,8 @@ import MenuIcon from "@material-ui/icons/Menu";
 
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import NotificationsIcon from "@material-ui/icons/Notifications";
-import BASE_URL from "../../baseURL";
 import { mainListItems, secondaryListItems } from "../listItems";
+import BASE_URL from "../../baseURL";
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -123,26 +123,25 @@ const useStyles = makeStyles((theme) => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
-    minWidth: 245,
+    minWidth: 227,
   },
   formControl: {
-    minWidth: 245,
+    minWidth: 227,
   },
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
 }));
 
-export default function CreateRequest(params) {
+export default function AddShop(params) {
   //const BASE_URL = "http://localhost:5000";
-  const [shopID, setShopID] = useState("none");
   const [shopName, setShopName] = useState("dummy");
-  const [amount, setAmount] = useState(0);
-  const [recordType, setRecordType] = useState("");
-  const [paymentMode, setPaymentMode] = useState("None");
-  const [remarks, setRemarks] = useState("");
+  const [line1, setLine1] = useState("Address line 1");
+  const [line2, setLine2] = useState("Address line 2");
+  const [city, setCity] = useState("City");
+  const [state, setState] = useState("State");
+  const [pinCode, setPinCode] = useState(0);
 
-  const [info, setInfo] = useState([]);
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -152,89 +151,56 @@ export default function CreateRequest(params) {
     setOpen(false);
   };
 
-  /* 
-    Request will look like
-
-    {
-        buyer : {buyerid, buyerName, rating, address},
-        shop : {shopID, shopName},
-        merchant : {merchantID,merchantName},
-        status : string
-        amount,
-        recordType:
-        PaymentMode : 
-        remarks:
-        balance shopwise
-    }
-    */
-
-  const initShopList = async () => {
-    const res = await fetch(BASE_URL + "shop");
-    const data = await res.json();
-    console.log(data);
-    setInfo(data.shops);
-  };
-  useEffect(() => {
-    initShopList();
-  }, []);
-
   const sendRequest = (e) => {
     e.preventDefault();
+    //{ shopName, merchantID, address, rating }
     const request = {
-      buyerID: JSON.parse(localStorage.getItem("userId")),
-      shopID,
-      amount,
-      recordType,
-      paymentMode: paymentMode || "None",
-      remarks,
+      merchantID: JSON.parse(localStorage.getItem("userId")),
+      shopName,
+      address: {
+        line1,
+        line2,
+        city,
+        state,
+        pinCode,
+      },
+      rating: 100,
     };
-    //console.log(`request`, request);
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
     };
-
-    fetch(BASE_URL + "request/", requestOptions)
+    fetch(BASE_URL + "shop/", requestOptions)
       .then((response) => response.json())
       .then((data) => {
-        alert("Request done..wait for merchant to accept");
+        alert("Shop Added");
         //redirecting to dashboard page
-        window.location.href = "/";
+        window.location.href='/addshop';
       })
       .catch((err) => {
-        alert("Failed to request");
+        alert("Failed to add Shop");
         console.log(`err`, err);
       });
   };
-  const selectShop = (e) => {
-    //console.log(e.target.value);
-    setShopID(e.target.value);
-    // const {shopName , merchantName, merchantID} = info.find((el)=> shopID === el._id);
-    // setShopName(shopName);
-    // setMerchantID(merchantID);
-    // setMerchantName(merchantName);
+  const onShopNameChange = (e) => {
+    setShopName(e.target.value);
   };
-
-  const onAmountChange = (e) => {
-    // console.log(e.target.value);
-    setAmount(e.target.value);
+  const onLine1Change = (e) => {
+    setLine1(e.target.value);
   };
-  const onRemarksChange = (e) => {
-    // console.log(e.target.value);
-    setRemarks(e.target.value);
+  const onLine2Change = (e) => {
+    setLine2(e.target.value);
   };
-
-  const onPaymentModeChange = (e) => {
-    // console.log(e.target.value);
-    setPaymentMode(e.target.value);
+  const onCityChange = (e) => {
+    setCity(e.target.value);
   };
-
-  const onRecordTypeChange = (e) => {
-    //console.log(e.target.value);
-    setRecordType(e.target.value);
+  const onStateChange = (e) => {
+    setState(e.target.value);
   };
-
+  const onPinCodeChange = (e) => {
+    setPinCode(e.target.value);
+  };
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -262,7 +228,7 @@ export default function CreateRequest(params) {
             noWrap
             className={classes.title}
           >
-            Create Request
+            Add Shop
           </Typography>
           <IconButton color="inherit">
             <Badge badgeContent={4} color="secondary">
@@ -293,45 +259,19 @@ export default function CreateRequest(params) {
         <Container maxWidth="lg" className={classes.container}>
           <div className="container">
             <form onSubmit={sendRequest}>
-              <FormControl variant="outlined" className={classes.formControl} 
-                style={{textAlign:"left"}}
-              >
-              <InputLabel id="demo-simple-select-outlined-label">
-                  Select Shop
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-outlined-label"
-                  id="demo-simple-select-outlined"
-                  onChange={selectShop}
-                  label="Select Shop"
-                >
-                 
-                  <MenuItem value="none">
-                    <em>None</em>
-                  </MenuItem>
-                  {info.map((shop) => {
-                    return (
-                      <MenuItem key={shop._id} value={shop._id}>
-                        {shop.shopName}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
-              { shopID !== "none" && <>
-              <FormControl 
-                style={{ display: "block", margin: "10px 0 10px 0",  }}
+              <FormControl
+                style={{ display: "block", margin: "10px 0 10px 0" }}
               >
                 <TextField
                   id="outlined-basic"
-                  label="Amount"
+                  label="Shop Name"
                   variant="outlined"
-                  onChange={onAmountChange}
+                  onChange={onShopNameChange}
                   required
                 />
               </FormControl>
               <FormControl component="fieldset">
-                <FormLabel
+                <label
                   component="legend"
                   style={{
                     textAlign: "left",
@@ -339,25 +279,8 @@ export default function CreateRequest(params) {
                     margin: "0 5px 0 5px",
                   }}
                 >
-                  Record Type
-                </FormLabel>
-                <RadioGroup
-                  aria-label="record"
-                  name="recordtypes"
-                  style={{ display: "block", width: "220px" }}
-                  onChange={onRecordTypeChange}
-                >
-                  <FormControlLabel
-                    value="DEBIT"
-                    control={<Radio />}
-                    label="Debit"
-                  />
-                  <FormControlLabel
-                    value="CREDIT"
-                    control={<Radio />}
-                    label="Credit"
-                  />
-                </RadioGroup>
+                  Address
+                </label>
               </FormControl>
 
               <FormControl
@@ -365,17 +288,53 @@ export default function CreateRequest(params) {
               >
                 <TextField
                   id="outlined-basic"
-                  label="PaymentMode"
+                  label="Address Line1"
                   variant="outlined"
-                  onChange={onPaymentModeChange}
+                  onChange={onLine1Change}
+                  required
                 />
               </FormControl>
-              <FormControl style={{ display: "block" }}>
+              <FormControl
+                style={{ display: "block", margin: "10px 0 10px 0" }}
+              >
                 <TextField
                   id="outlined-basic"
-                  label="Remarks"
+                  label="Address Line2"
                   variant="outlined"
-                  onChange={onRemarksChange}
+                  onChange={onLine2Change}
+                />
+              </FormControl>
+              <FormControl
+                style={{ display: "block", margin: "10px 0 10px 0" }}
+              >
+                <TextField
+                  id="outlined-basic"
+                  label="City"
+                  variant="outlined"
+                  onChange={onCityChange}
+                  required
+                />
+              </FormControl>
+              <FormControl
+                style={{ display: "block", margin: "10px 0 10px 0" }}
+              >
+                <TextField
+                  id="outlined-basic"
+                  label="State"
+                  variant="outlined"
+                  onChange={onStateChange}
+                  required
+                />
+              </FormControl>
+              <FormControl
+                style={{ display: "block", margin: "10px 0 10px 0" }}
+              >
+                <TextField
+                  id="outlined-basic"
+                  label="Pin Code"
+                  variant="outlined"
+                  onChange={onPinCodeChange}
+                  required
                 />
               </FormControl>
               <Button
@@ -384,10 +343,8 @@ export default function CreateRequest(params) {
                 color="primary"
                 className={classes.submit}
               >
-                Send Request
+                Add Shop
               </Button>
-              </>
-              }
             </form>
           </div>
         </Container>
