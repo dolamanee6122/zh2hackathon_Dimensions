@@ -5,6 +5,7 @@ import AddIcon from "@material-ui/icons/Add";
 import RecentTransactions from './RecentTransactions'
 import Requests from './Requests'
 import StatCards from './StatCards'
+import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -104,6 +105,20 @@ const DataElements = ({stats,request,id,accountType,trxns}) => {
     const classes = useStyles();
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
     const requests = clsx(classes.paper, classes.requests);
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    const d= new Date();
+    const day =d.getDate();
+    const month = monthNames[d.getMonth()];
+
+    var first = d.getDate() - d.getDay(); // First day is the day of the month - the day of the week
+    var last = first + 6; // last day is the first day + 6
+
+    var firstday = new Date(d.setDate(first)).getDate()+ " "+monthNames[new Date(d.setDate(first)).getMonth()];
+    var lastday = new Date(d.setDate(last)).getDate()+ " "+monthNames[new Date(d.setDate(last)).getMonth()];
+
+    console.log(d, d[0]);
     return (
         <div>
             <Grid container spacing={3}>
@@ -113,7 +128,7 @@ const DataElements = ({stats,request,id,accountType,trxns}) => {
                 <StatCards
                   title={"Today"}
                   balance={stats.today}
-                  lastUpdated={"53 mins ago"}
+                  lastUpdated={day+" "+month}
                 />
               </Paper>
             </Grid>
@@ -123,7 +138,7 @@ const DataElements = ({stats,request,id,accountType,trxns}) => {
                 <StatCards
                   title={"This Week"}
                   balance={stats.week}
-                  lastUpdated={"7-15 August 2021"}
+                  lastUpdated={firstday+"-"+lastday}
                 />
               </Paper>
             </Grid>
@@ -133,7 +148,7 @@ const DataElements = ({stats,request,id,accountType,trxns}) => {
                 <StatCards
                   title={"This Month"}
                   balance={stats.month}
-                  lastUpdated={"21 August 2021"}
+                  lastUpdated={month}
                 />
               </Paper>
             </Grid>
@@ -141,9 +156,9 @@ const DataElements = ({stats,request,id,accountType,trxns}) => {
             <Grid item xs={12} md={6} lg={3}>
               <Paper className={fixedHeightPaper}>
                 <StatCards
-                  title={"All Tieme"}
+                  title={"All Time"}
                   balance={stats.allTime}
-                  lastUpdated="July-Sept"
+                  lastUpdated=""
                 />
               </Paper>
             </Grid>
@@ -160,9 +175,11 @@ const DataElements = ({stats,request,id,accountType,trxns}) => {
               </Paper>
             </Grid>
           </Grid>
-        <Fab color="primary" aria-label="add" style={{position:"absolute", bottom:"24px", right:"48px"}}>
-            <AddIcon />
-        </Fab>
+          <Link to="/addShop">
+            <Fab color="primary" aria-label="add" style={{position:"absolute", bottom:"24px", right:"48px"}}>
+                <AddIcon />
+            </Fab>
+          </Link>
         </div>
     )
 }

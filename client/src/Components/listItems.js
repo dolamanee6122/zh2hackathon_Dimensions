@@ -7,33 +7,47 @@ import DashboardIcon from "@material-ui/icons/Dashboard";
 import PeopleIcon from "@material-ui/icons/People";
 import BarChartIcon from "@material-ui/icons/BarChart";
 import AssignmentIcon from "@material-ui/icons/Assignment";
+import CodeIcon from '@material-ui/icons/Code';
 import { Badge, Chip, ListItemSecondaryAction } from "@material-ui/core";
+import { Link } from "react-router-dom";
+
+
+const handleClick = () => {
+  window.open("https://github.com/dolamanee6122/Dimensions");
+};
+
 export const mainListItems = (
   <div>
+    <Link to="/">
     <ListItem button>
       <ListItemIcon>
         <DashboardIcon />
       </ListItemIcon>
       <ListItemText primary="Dashboard" />
     </ListItem>
+    </Link>
+    <Link to="/requests">
     <ListItem button>
       <ListItemIcon>
         <PeopleIcon />
       </ListItemIcon>
       <ListItemText primary="Requests" />
-      <ListItemSecondaryAction>
+      {/* <ListItemSecondaryAction>
         <Chip label="3" size="small" color="primary" />
-      </ListItemSecondaryAction>
+      </ListItemSecondaryAction> */}
     </ListItem>
+    </Link>
+    <Link to="/transactions">
     <ListItem button>
       <ListItemIcon>
         <BarChartIcon />
       </ListItemIcon>
       <ListItemText primary="Transactions" />
-      <ListItemSecondaryAction>
+      {/* <ListItemSecondaryAction>
         <Chip label="4" size="small" />
-      </ListItemSecondaryAction>
+      </ListItemSecondaryAction> */}
     </ListItem>
+    </Link>
   </div>
 );
 
@@ -44,19 +58,13 @@ export const secondaryListItems = (
       <ListItemIcon>
         <AssignmentIcon />
       </ListItemIcon>
-      <ListItemText primary="Current Week" />
+      <ListItemText primary="Your Profile" />
     </ListItem>
     <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
+      <ListItemIcon onClick={handleClick}>
+        <CodeIcon/>
       </ListItemIcon>
-      <ListItemText primary="Current Month" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Last Quarter" />
-    </ListItem>
+      <ListItemText onClick={handleClick} primary="Github Repo" />
+      </ListItem>
   </div>
 );
