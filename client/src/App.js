@@ -8,6 +8,7 @@ import { useCreds } from './Components/Authentication/useCreds';
 import Dashboard from './Components/Dashboard/Dashboard';
 import CreateRequest from './Components/CreateRequest/CreateRequest';
 import Transactions from './Components/Transaction/Transactions';
+import AddShop from './Components/AddShop/AddShop';
 
 
 
@@ -59,6 +60,16 @@ function App() {
           <RequestListing {...props} handleLogout={handleLogout} />
         )}
         />
+        {accountType === "BUYER" && (
+            <Route path="/createrequest">
+              <CreateRequest />
+            </Route>
+        )}
+        {accountType === "MERCHANT" && (
+            <Route path="/addShop">
+              <AddShop />
+            </Route>
+        )}
          <Route path="/transactions">
               <Transactions/>
             </Route>
@@ -69,3 +80,5 @@ function App() {
 }
 
 export default App;
+ // "mongoURI": "mongodb+srv://dolamanee6122:Dolamanee@mongodb@1036@cluster0.xt3vs.mongodb.net/dimensions?retryWrites=true&w=majority",
+     

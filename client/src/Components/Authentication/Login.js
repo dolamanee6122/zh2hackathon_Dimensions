@@ -8,8 +8,17 @@ import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import PersonIcon from '@material-ui/icons/Person';
 import PhoneIcon from '@material-ui/icons/Phone';
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import BASE_URL from '../../baseURL';
 import PropTypes from 'prop-types';
+import DateFnsUtils from '@date-io/date-fns';
+import PaymentIcon from '@material-ui/icons/Payment';
+import DatePicker from "react-datepicker";
+
+import "react-datepicker/dist/react-datepicker.css";
+import { getTime } from 'date-fns/esm';
+import { setMonth, setYear } from 'date-fns';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,7 +36,15 @@ const initialValues={
     phone:"",
     email:"",
     password:"",
+    pan:"",
+    dob:{
+        day:"",
+        month:"",
+        year:""
+    }
 }
+
+
 
 const Login = ({setCreds}) => {
     const classes = useStyles();
@@ -54,6 +71,18 @@ const Login = ({setCreds}) => {
         e.preventDefault();
         setSelectedType(e.target.value);
     }
+    
+    const [startDate, setStartDate] = useState(new Date());
+    const handledobChange=(date)=>{
+         const dob =date;
+        //  setDay(dob.getDate());
+        //  setMonth(dob.getMonth());
+        //  setYear(dob.getFullYear());
+         const d=dob.getDate(), m=dob.getMonth(),y=dob.getFullYear();
+         setStartDate(date);
+         setValues({...values,dob:{day:d,month:m,year:y}});
+        //  console.log(typeof(date[0]),startDate.getDate());
+    }
 
     const handleInputChange=(e)=>{
         const name=e.target.name;
@@ -65,6 +94,7 @@ const Login = ({setCreds}) => {
     }
 
     async function RegisterUser(){
+            console.log(`values`, values)
             let URL;
             URL=(selectedType==='MERCHANT')?BASE_URL+"merchants/":BASE_URL+"buyers/";
             console.log(`URL`, URL)
@@ -78,6 +108,35 @@ const Login = ({setCreds}) => {
                                     mobileNo:`${values.phone}`,
                                     accountType:`${selectedType.toLowerCase()}`
                                  }})
+    //     body: JSON.stringify({"fusionUser": {
+    //     "ifiID": "140793",
+    //     "spoolID": "3deb5a70-311c-11ea-978f-2e728ce88125",
+    //     "individualType": "RAH",
+    //     "firstName": `${values.firstName}`,
+    //     "dob": `${values.dob}`,
+    //     "kycDetails": {
+    //         "kycStatus": "MINIMAL",
+    //         "kycStatusPostExpiry": "KYC_EXPIRED",
+    //         "kycAttributes": {},
+    //         "authData": {
+    //             "PAN": `${values.pan}`
+    //         },
+    //         "authType": "PAN"
+    //     },
+    //     "vectors": [
+    //         {
+    //             "type": "e",
+    //             "value": `${values.email}` ,
+    //             "isVerified": true
+    //         }
+    //     ]
+    // },
+    // "user": {
+        // "firstName": `${values.firstName}`,
+    //     "email": `${values.email}`,
+    //     "password":`${values.password}` ,
+    //     "accountType": `${selectedType.toLowerCase()}`
+    // }})
             };
             console.log(`requestOptions.body`, requestOptions.body)
              fetch(`${URL}`,requestOptions)
@@ -277,7 +336,6 @@ const Login = ({setCreds}) => {
                                 fullWidth
                                 helperText="Select account that suits you"
                                 required
-                                
                             >
                             { types.map((e)=>{
                                 return <MenuItem key={e} value={e}>{e}</MenuItem>
@@ -285,6 +343,28 @@ const Login = ({setCreds}) => {
                             }
                             </TextField>
                         </Paper>
+                        <Paper component="form" className={classes.root}>
+                            DOB
+                        <CalendarTodayIcon/>
+                        <DatePicker 
+                        selected={startDate} 
+                        onChange={handledobChange}
+                        showYearDropdown
+                      />
+                        </Paper>
+                        <Paper component="form" className={classes.root}>
+                        <PaymentIcon/>
+                            <TextField
+                                label="PAN"
+                                name="pan"
+                                className={classes.input}
+                                placeholder="ABCDE4563A"
+                                fullWidth
+                                value={values.pan}
+                                onChange={handleInputChange}
+                            />
+                        </Paper>
+
                         
                         <Paper component="form" className={classes.root}>
                         <PhoneIcon/>
