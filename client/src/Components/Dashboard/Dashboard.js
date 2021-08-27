@@ -139,7 +139,8 @@ export default function Dashboard({handleLogout}) {
 
   // const id = "61136f34480a693fb4d49453";
 
-  const idString = sessionStorage.getItem('userId');
+  // const idString = sessionStorage.getItem('userId');
+  const idString = localStorage.getItem('userId');
   const id = JSON.parse(idString);
   console.log(`id in Dash---------------------------------------------------------------------`, id)
   const apiURL = BASE_URL + "merchants/" + id;

@@ -36,18 +36,15 @@ export default function StatCards({ title, balance, lastUpdated }) {
       <div style={{ display: "flex", fontSize: "18px" }}>
         <div>
           Credit
-          <div className={classes.valueGreen}>{balance.credit}</div>
+          <div className={classes.valueRed}>{balance.credit}</div>
         </div>
         <div style={{ marginLeft: "auto", marginRight: "48px" }}>
           Debit
-          <div className={classes.valueRed}>{balance.debit}</div>
+          <div className={classes.valueGreen}>{balance.debit}</div>
         </div>
       </div>
       <br />
       <div>
-        <Link color="primary" href="link">
-          View Details
-        </Link>
       </div>
     </div>
   );

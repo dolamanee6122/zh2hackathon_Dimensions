@@ -15,6 +15,10 @@ const BuyerSchema = new Schema(
       required: true,
       default: 50,
     },
+    accountID: {
+      type: String,
+      required: true,
+    },
     balanceShopWise: [
       {
         shopID: {

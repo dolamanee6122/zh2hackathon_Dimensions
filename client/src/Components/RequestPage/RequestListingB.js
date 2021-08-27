@@ -24,8 +24,8 @@ import {
   MenuItem,
   Select,
 } from "@material-ui/core";
-import DataElements from "./DataElements";
-
+import EachRequest from "../DashboardB/EachRequest";
+import { useLocation } from "react-router-dom";
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -118,8 +118,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function DashboardB({handleLogout}) {
-  
+export default function RequestListing({ handleLogout }) {
+  const idString = localStorage.getItem("userId");
+  const id = JSON.parse(idString);
+  const accountType = JSON.parse(localStorage.getItem("accountType"));
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -128,74 +130,24 @@ export default function DashboardB({handleLogout}) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
-  const [buyerInfo, setBuyerInfo] = useState();
   const [loading, setLoading] = useState(true);
-  const [shops, setShops] = useState();
   const [request, setRequest] = useState();
-  const [stats, setStats] = useState();
-  const [trxns,setTrxns] =useState();
 
-  // const id = "61136f34480a693fb4d49453";
-
-  const idString = localStorage.getItem('userId');
-  const id = JSON.parse(idString);
-  console.log(`id in DashB---------------------------------------------------------------------`, id)
-  const apiURL = BASE_URL + "buyers/" + id;
-
-  console.log(apiURL);
-
-
-
-  async function fetchBuyer() {
-    console.log("here");
-    const response = await fetch(`${apiURL}`);
-    const info = await response.json();
-    console.log(`info`, info);
-    setBuyerInfo(info.buyer);
-    await fetchStats(id, "buyer");
-    await fetchTransactions(id);
-    await fetchRequests(id);
-
-    setLoading(false);
-  }
   async function fetchRequests(id) {
-    const URL = BASE_URL + "request/" + id + "/?limit=3";
-    console.log("@request",URL);
+    console.log("from fetchRequest from RequestListing");
+    const URL = BASE_URL + "request/" + id;
+    console.log(`URL`, URL);
     const response = await fetch(`${URL}`);
     const info = await response.json();
-    console.log("Requests------------------->", info);
+    console.log("requests------------------->", info);
     setRequest(info.requests);
     setLoading(false);
   }
 
-    async function fetchTransactions(id) {
-    console.log("@trn");
-    const URL = BASE_URL + "transaction/" + id + "/?limit=3";
-    const response = await fetch(`${URL}`);
-    const info = await response.json();
-    console.log("Trxn in DBBBBBBBBBBBBBBBBBooooo------------->", info);
-    // setRequest(info.reque);
-    setTrxns(info.transactions);
-  }
-
-
-  async function fetchStats(id, type) {
-    console.log("from fetchStats");
-    const URL =BASE_URL + "transaction/balanceanalytics/" + id + "/?type=" + type;
-    console.log(`URL`, URL);
-    const response = await fetch(`${URL}`);
-    const info = await response.json();
-    console.log("stats--------->", info);
-    setStats(info.balanceAnalytics);
-  }
-
   useEffect(async () => {
-    console.log("useEffece t Caked");
-    await fetchBuyer();
+    await fetchRequests(id);
+    console.log(`request hai`, request);
   }, []);
-
-
   return (
     <div>
       {/* {console.log(`merchantInfo`, merchantInfo)}
@@ -228,14 +180,20 @@ export default function DashboardB({handleLogout}) {
                 noWrap
                 className={classes.title}
               >
-                Dashboard
+                Requests
               </Typography>
               <IconButton color="inherit">
                 <Badge badgeContent={4} color="secondary">
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
-              <Button  variant="contained" color="secondary" onClick={handleLogout}>Logout</Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
             </Toolbar>
           </AppBar>
           <Drawer
@@ -261,18 +219,9 @@ export default function DashboardB({handleLogout}) {
           <main className={classes.content}>
             <div className={classes.appBarSpacer} />
             <Container maxWidth="lg" className={classes.container}>
-              <div style={{ display: "flex" }}>
-                <h2 style={{ display: "flex-start" }}>
-                  Hi, {buyerInfo.user.firstName}
-                </h2>
-              </div>
-              <DataElements
-                stats={stats}
-                request={request}
-                trxns={trxns}
-                id={id}
-                accountType={"buyer"}
-              />
+              {request.map((e) => {
+                return <EachRequest data={e} />;
+              })}
             </Container>
           </main>
         </div>

@@ -16,7 +16,14 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import { mainListItems, secondaryListItems } from "../listItems";
 import BASE_URL from "../../baseURL";
-import { Button, FormHelperText, InputLabel, LinearProgress, MenuItem, Select } from "@material-ui/core";
+import {
+  Button,
+  FormHelperText,
+  InputLabel,
+  LinearProgress,
+  MenuItem,
+  Select,
+} from "@material-ui/core";
 import EachRequest from "../Dashboard/EachRequest";
 import { useLocation } from "react-router-dom";
 const drawerWidth = 240;
@@ -111,11 +118,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function RequestListing({handleLogout}) {
-
-  const idString = sessionStorage.getItem('userId');
+export default function RequestListing({ handleLogout }) {
+  const idString = localStorage.getItem("userId");
   const id = JSON.parse(idString);
-
+  const accountType = JSON.parse(localStorage.getItem("accountType"));
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -126,7 +132,6 @@ export default function RequestListing({handleLogout}) {
   };
   const [loading, setLoading] = useState(true);
   const [request, setRequest] = useState();
-
 
   async function fetchRequests(id) {
     console.log("from fetchRequest from RequestListing");
@@ -141,78 +146,86 @@ export default function RequestListing({handleLogout}) {
 
   useEffect(async () => {
     await fetchRequests(id);
-    console.log(`request hai`, request)
-  }, [])
+    console.log(`request hai`, request);
+  }, []);
   return (
-
     <div>
       {/* {console.log(`merchantInfo`, merchantInfo)}
       {console.log(`shopList`, shops)} */}
       {loading && <LinearProgress />}
-      {!loading && <div className={classes.root}>
-        <CssBaseline />
-        <AppBar
-          position="absolute"
-          className={clsx(classes.appBar, open && classes.appBarShift)}
-        >
-          <Toolbar className={classes.toolbar}>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              className={clsx(
-                classes.menuButton,
-                open && classes.menuButtonHidden
-              )}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              className={classes.title}
-            >
-              Requests
-            </Typography>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <Button  variant="contained" color="secondary" onClick={handleLogout}>Logout</Button>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)
-          }}
-          open={open}
-        >
-          <div className={classes.toolbarIcon}>
-            <IconButton onClick={handleDrawerClose}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </div>
-          <Divider />
-          <List>{mainListItems}</List>
-          <Divider />
-          <List>{secondaryListItems}</List>
-        </Drawer>
-        <main className={classes.content}>
-          <div className={classes.appBarSpacer} />
-          <Container maxWidth="lg" className={classes.container}>
-            {request.map((e) => {
-              return <EachRequest data={e} />
-            })}
-          </Container>
-        </main>
-
-      </div>}
-
+      {!loading && (
+        <div className={classes.root}>
+          <CssBaseline />
+          <AppBar
+            position="absolute"
+            className={clsx(classes.appBar, open && classes.appBarShift)}
+          >
+            <Toolbar className={classes.toolbar}>
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                className={clsx(
+                  classes.menuButton,
+                  open && classes.menuButtonHidden
+                )}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography
+                component="h1"
+                variant="h6"
+                color="inherit"
+                noWrap
+                className={classes.title}
+              >
+                Requests
+              </Typography>
+              <IconButton color="inherit">
+                <Badge badgeContent={4} color="secondary">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+            </Toolbar>
+          </AppBar>
+          <Drawer
+            variant="permanent"
+            classes={{
+              paper: clsx(
+                classes.drawerPaper,
+                !open && classes.drawerPaperClose
+              ),
+            }}
+            open={open}
+          >
+            <div className={classes.toolbarIcon}>
+              <IconButton onClick={handleDrawerClose}>
+                <ChevronLeftIcon />
+              </IconButton>
+            </div>
+            <Divider />
+            <List>{mainListItems}</List>
+            <Divider />
+            <List>{secondaryListItems}</List>
+          </Drawer>
+          <main className={classes.content}>
+            <div className={classes.appBarSpacer} />
+            <Container maxWidth="lg" className={classes.container}>
+              {request.map((e) => {
+                return <EachRequest data={e} />;
+              })}
+            </Container>
+          </main>
+        </div>
+      )}
     </div>
   );
 }

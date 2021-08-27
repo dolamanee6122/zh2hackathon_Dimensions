@@ -4,52 +4,57 @@ import CancelOutlinedIcon from "@material-ui/icons/CancelOutlined";
 import React from "react";
 import "./EachRequest.css";
 import BASE_URL from "../../baseURL";
-const EachRequest = ({data}) => {
+import { useState } from "react";
+const EachRequest = ({data,reqStatus,acceptRequest,rejectRequest}) => {
  
   console.log(`data`, data._id)
    const id =data._id;
-  async function acceptRequest(id){
-    console.log("in accept");
-    const URL=BASE_URL+"transaction/";
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ requestID: `${id}` })
-  };
-     fetch(`${URL}`,requestOptions)
-     .then((response)=>console.log(`response`, response))
-     .catch((err)=>console.log(`err`, err))
+  // async function acceptRequest(id){
+  //   console.log("in accept");
+  //   const URL=BASE_URL+"transaction/";
+  //   const requestOptions = {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({ requestID: `${id}` })
+  // };
+  //    fetch(`${URL}`,requestOptions)
+  //    .then((response)=>console.log(`response`, response))
+  //    .catch((err)=>console.log(`err`, err))
    
-    // console.log(`info`, info);
-  }
-  async function rejectRequest(id){
-    console.log("in accept");
-    const URL=BASE_URL+"request/reject";
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ requestID: `${id}` })
-  };
-     fetch(`${URL}`,requestOptions)
-     .then((response)=>console.log(`response`, response))
-     .catch((err)=>console.log(`err`, err))
+  //   // console.log(`info`, info);
+  // }
+  // async function rejectRequest(id){
+  //   console.log("in accept");
+  //   const URL=BASE_URL+"request/reject";
+  //   const requestOptions = {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({ requestID: `${id}` })
+  // };
+  //    fetch(`${URL}`,requestOptions)
+  //    .then((response)=>console.log(`response`, response))
+  //    .catch((err)=>console.log(`err`, err))
    
-    // console.log(`info`, info);
-  }
+  //   // console.log(`info`, info);
+  // }
 
   const handleAcceptance=(e)=>{
     e.preventDefault();
+    setStatus("APPROVED");
     console.log("acceptance called")
     acceptRequest(id);
-
   }
 
   const handleRejection=(e)=>{
     e.preventDefault();
+    setStatus("REJECTED");
+
     console.log("Rejection called")
     rejectRequest(id);
 
   }
+  const [status,setStatus]=useState(reqStatus);
+
 
   return (
     <Card>

@@ -7,33 +7,47 @@ import DashboardIcon from "@material-ui/icons/Dashboard";
 import PeopleIcon from "@material-ui/icons/People";
 import BarChartIcon from "@material-ui/icons/BarChart";
 import AssignmentIcon from "@material-ui/icons/Assignment";
+import CodeIcon from '@material-ui/icons/Code';
 import { Badge, Chip, ListItemSecondaryAction } from "@material-ui/core";
+import { Link } from "react-router-dom";
+
+
+const handleClick = () => {
+  window.open("https://github.com/dolamanee6122/Dimensions");
+};
+
 export const mainListItems = (
   <div>
-    <ListItem button>
-      <ListItemIcon>
-        <DashboardIcon />
-      </ListItemIcon>
-      <ListItemText primary="Dashboard" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <PeopleIcon />
-      </ListItemIcon>
-      <ListItemText primary="Requests" />
-      <ListItemSecondaryAction>
+    <Link to="/">
+      <ListItem button>
+        <ListItemIcon>
+          <DashboardIcon />
+        </ListItemIcon>
+        <ListItemText primary="Dashboard" />
+      </ListItem>
+    </Link>
+    <Link to="/requests">
+      <ListItem button>
+        <ListItemIcon>
+          <PeopleIcon />
+        </ListItemIcon>
+        <ListItemText primary="Requests" />
+        {/* <ListItemSecondaryAction>
         <Chip label="3" size="small" color="primary" />
-      </ListItemSecondaryAction>
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <BarChartIcon />
-      </ListItemIcon>
-      <ListItemText primary="Transactions" />
-      <ListItemSecondaryAction>
+      </ListItemSecondaryAction> */}
+      </ListItem>
+    </Link>
+    <Link to="/transactions">
+      <ListItem button>
+        <ListItemIcon>
+          <BarChartIcon />
+        </ListItemIcon>
+        <ListItemText primary="Transactions" />
+        {/* <ListItemSecondaryAction>
         <Chip label="4" size="small" />
-      </ListItemSecondaryAction>
-    </ListItem>
+      </ListItemSecondaryAction> */}
+      </ListItem>
+    </Link>
   </div>
 );
 
@@ -44,19 +58,16 @@ export const secondaryListItems = (
       <ListItemIcon>
         <AssignmentIcon />
       </ListItemIcon>
-      <ListItemText primary="Current Week" />
+      <Link to="/profile">
+        <ListItemText primary="Your Profile" />
+      </Link>
+
     </ListItem>
     <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
+      <ListItemIcon onClick={handleClick}>
+        <CodeIcon />
       </ListItemIcon>
-      <ListItemText primary="Current Month" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Last Quarter" />
+      <ListItemText onClick={handleClick} primary="Github Repo" />
     </ListItem>
   </div>
 );

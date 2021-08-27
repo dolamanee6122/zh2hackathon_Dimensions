@@ -26,7 +26,7 @@ import {
 import { useState, useEffect } from "react";
 import clsx from "clsx";
 import MenuIcon from "@material-ui/icons/Menu";
-
+import { useHistory } from "react-router-dom";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import BASE_URL from "../../baseURL";
@@ -123,10 +123,10 @@ const useStyles = makeStyles((theme) => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
-    minWidth: 227,
+    minWidth: 245,
   },
   formControl: {
-    minWidth: 227,
+    minWidth: 245,
   },
   selectEmpty: {
     marginTop: theme.spacing(2),
@@ -135,7 +135,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CreateRequest(params) {
   //const BASE_URL = "http://localhost:5000";
-  const [shopID, setShopID] = useState("dummyID");
+  const [shopID, setShopID] = useState("none");
   const [shopName, setShopName] = useState("dummy");
   const [amount, setAmount] = useState(0);
   const [recordType, setRecordType] = useState("");
@@ -151,6 +151,7 @@ export default function CreateRequest(params) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+  let history = useHistory();
 
   /* 
     Request will look like
@@ -168,11 +169,13 @@ export default function CreateRequest(params) {
     }
     */
 
-  const initShopList = async () => {
-    const res = await fetch(BASE_URL + "shop");
-    const data = await res.json();
-    console.log(data);
-    setInfo(data.shops);
+  const initShopList = () => {
+    // setShopID(JSON.parse(localStorage.getItem("shopRequestID")));
+    // setShopName(JSON.parse(localStorage.getItem("shopRequestName")));
+    // console.log(shopName,shopID);
+    console.log(params);
+    setShopID(params.location.data.id);
+    setShopName(params.location.data.name);
   };
   useEffect(() => {
     initShopList();
@@ -181,7 +184,7 @@ export default function CreateRequest(params) {
   const sendRequest = (e) => {
     e.preventDefault();
     const request = {
-      buyerID: localStorage.getItem("id") || "61123257a49bb59034d70b86",
+      buyerID: JSON.parse(localStorage.getItem("userId")),
       shopID,
       amount,
       recordType,
@@ -200,7 +203,8 @@ export default function CreateRequest(params) {
       .then((data) => {
         alert("Request done..wait for merchant to accept");
         //redirecting to dashboard page
-        window.location.href = "/";
+        //window.location.href = "/";
+        history.goBack();
       })
       .catch((err) => {
         alert("Failed to request");
@@ -293,8 +297,10 @@ export default function CreateRequest(params) {
         <Container maxWidth="lg" className={classes.container}>
           <div className="container">
             <form onSubmit={sendRequest}>
-              <FormControl variant="outlined" className={classes.formControl}>
-                <InputLabel id="demo-simple-select-outlined-label">
+              {/* <FormControl variant="outlined" className={classes.formControl} 
+                style={{textAlign:"left"}}
+              >
+              <InputLabel id="demo-simple-select-outlined-label">
                   Select Shop
                 </InputLabel>
                 <Select
@@ -303,7 +309,8 @@ export default function CreateRequest(params) {
                   onChange={selectShop}
                   label="Select Shop"
                 >
-                  <MenuItem value="">
+                 
+                  <MenuItem value="none">
                     <em>None</em>
                   </MenuItem>
                   {info.map((shop) => {
@@ -314,74 +321,89 @@ export default function CreateRequest(params) {
                     );
                   })}
                 </Select>
-              </FormControl>
-              <FormControl
-                style={{ display: "block", margin: "10px 0 10px 0" }}
-              >
-                <TextField
-                  id="outlined-basic"
-                  label="Amount"
-                  variant="outlined"
-                  onChange={onAmountChange}
-                  required
-                />
-              </FormControl>
-              <FormControl component="fieldset">
-                <FormLabel
-                  component="legend"
-                  style={{
-                    textAlign: "left",
-                    width: "220px",
-                    margin: "0 5px 0 5px",
-                  }}
-                >
-                  Record Type
-                </FormLabel>
-                <RadioGroup
-                  aria-label="record"
-                  name="recordtypes"
-                  style={{ display: "block", width: "220px" }}
-                  onChange={onRecordTypeChange}
-                >
-                  <FormControlLabel
-                    value="DEBIT"
-                    control={<Radio />}
-                    label="Debit"
-                  />
-                  <FormControlLabel
-                    value="CREDIT"
-                    control={<Radio />}
-                    label="Credit"
-                  />
-                </RadioGroup>
-              </FormControl>
+              </FormControl> */}
+              {shopID !== "none" && (
+                <>
+                  <FormControl
+                    style={{ display: "block", margin: "10px 0 10px 0" }}
+                  >
+                    <TextField
+                      id="outlined-basic"
+                      label="Shop Name"
+                      value={shopName}
+                      variant="outlined"
+                      disabled
+                    />
+                  </FormControl>
+                  <FormControl
+                    style={{ display: "block", margin: "10px 0 10px 0" }}
+                  >
+                    <TextField
+                      id="outlined-basic"
+                      label="Amount"
+                      variant="outlined"
+                      onChange={onAmountChange}
+                      required
+                    />
+                  </FormControl>
+                  <FormControl component="fieldset">
+                    <FormLabel
+                      component="legend"
+                      style={{
+                        textAlign: "left",
+                        width: "220px",
+                        margin: "0 5px 0 5px",
+                      }}
+                    >
+                      Record Type
+                    </FormLabel>
+                    <RadioGroup
+                      aria-label="record"
+                      name="recordtypes"
+                      style={{ display: "block", width: "220px" }}
+                      onChange={onRecordTypeChange}
+                    >
+                      <FormControlLabel
+                        value="DEBIT"
+                        control={<Radio />}
+                        label="Pay"
+                      />
+                      <FormControlLabel
+                        value="CREDIT"
+                        control={<Radio />}
+                        label="Ask for Credit"
+                      />
+                    </RadioGroup>
+                  </FormControl>
 
-              <FormControl
-                style={{ display: "block", margin: "10px 0 10px 0" }}
-              >
-                <TextField
-                  id="outlined-basic"
-                  label="PaymentMode"
-                  variant="outlined"
-                  onChange={onPaymentModeChange}
-                />
-              </FormControl>
-              <FormControl style={{ display: "block" }}>
-                <TextField
-                  id="outlined-basic"
-                  label="Remarks"
-                  variant="outlined"
-                  onChange={onRemarksChange}
-                />
-              </FormControl>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-              >
-                Send Request
-              </Button>
+                  <FormControl
+                    style={{ display: "block", margin: "10px 0 10px 0" }}
+                  >
+                    <TextField
+                      id="outlined-basic"
+                      label="PaymentMode"
+                      variant="outlined"
+                      onChange={onPaymentModeChange}
+                    />
+                  </FormControl>
+                  <FormControl style={{ display: "block" }}>
+                    <TextField
+                      id="outlined-basic"
+                      label="Remarks"
+                      variant="outlined"
+                      onChange={onRemarksChange}
+                    />
+                  </FormControl>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    className={classes.submit}
+                  >
+                    Send Request
+                  </Button>
+                </>
+              )}
             </form>
           </div>
         </Container>
