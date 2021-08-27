@@ -98,7 +98,7 @@ router.get("/:id", auth, async (req, res) => {
 // @access  Protected
 router.get("/", auth, async (req, res) => {
   try {
-    const shops = await Shop.find({}, { shopName: 1 });
+    const shops = await Shop.find();
     if (!shops) return res.status(404).json({ message: "Invalid ShopID" });
     res.json({ message: "OK", shops });
   } catch (err) {
