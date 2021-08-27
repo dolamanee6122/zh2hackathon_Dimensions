@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -15,13 +16,19 @@ import Drawer from "@material-ui/core/Drawer";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import { mainListItems, secondaryListItems } from "./../listItems";
+import { mainListItems, secondaryListItems } from "../listItems";
 import BASE_URL from '../../baseURL';
 import { LinearProgress, Select } from "@material-ui/core";
 import './Profile.css';
 import Rating from '@material-ui/lab/Rating';
 import Box from '@material-ui/core/Box';
 import EditIcon from '@material-ui/icons/Edit';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import FacebookIcon from '@material-ui/icons/Facebook';
+import LocalPhoneIcon from '@material-ui/icons/LocalPhone';
+import ContactMailIcon from '@material-ui/icons/ContactMail';
+// import { useState } from "react";
 const useRowStyles = makeStyles({
     root: {
         "& > *": {
@@ -99,7 +106,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: "column",
         flexGrow: 1,
         height: "100vh",
-        overflow: "auto",
+        overflow: "auto"
     },
     container: {
         paddingTop: theme.spacing(4),
@@ -124,26 +131,40 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const getColor = (amt) => {
+    if (amt === 0)
+        return "black";
+    else if (amt > 0)
+        return "green";
+    return "red";
+}
 
 
 const fetchName = async () => {
     try {
-        const id = JSON.parse(sessionStorage.getItem("userId"));
-        const accountType = JSON.parse(sessionStorage.getItem("accountType"));
+        const id = JSON.parse(localStorage.getItem("userId"));
+        const accountType = JSON.parse(localStorage.getItem("accountType"));
+        accountType.toLowerCase();
         const res = await fetch(BASE_URL + accountType + "s/" + id);
         const data = await res.json();
-        // console.log(data.merchant.user);
-        if (accountType === "MERCHANT")
-            return data.merchant.user.firstName + " " + data.merchant.user.lastName;
-        return data.buyer.user.firstName + " " + data.buyer.user.lastName;
+        console.log("hello", data.buyer.balanceShopWise);
+        return ({
+            name: data.firstName + " " + data.lastName,
+            verify: data.vectors[0].verified == true ? "YES" : "NO",
+            dob: data.dob,
+            balance: data.buyer.user.balance.balance,
+            color: getColor(data.buyer.user.balance.balance),
+            id: data.id,
+            shop: data.buyer.balanceShopWise
+        })
     }
     catch {
-        //console.log("error in name");
+        console.log("error in name");
         window.location.href = "/";
     }
 }
 
-export default function Transactions(props) {
+export default function Profile(props) {
     const [value, setValue] = React.useState(2);
     const classes = useStyles();
     const [open, setOpen] = React.useState(true);
@@ -153,7 +174,24 @@ export default function Transactions(props) {
     const handleDrawerClose = () => {
         setOpen(false);
     };
+    const accountType = JSON.parse(localStorage.getItem("accountType"));
     const [loading, setLoading] = useState(false);
+    const [pro, setPro] = useState({
+        name: "user",
+        gender: "",
+        dob: "01/01/2010",
+        verify: "No",
+        balance: "0.00",
+        color: "",
+        id: "****",
+        shop: []
+    })
+
+    useEffect(async () => {
+        const ndata = await fetchName();
+        setPro(ndata);
+        // console.log(ndata.shop);
+    }, [])
 
     return (
         <div>
@@ -210,40 +248,86 @@ export default function Transactions(props) {
                     <div className="div1">
                         <div style={{ display: "flex" }}>
                             <div className="imgCard">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBwgu1A5zgPSvfE83nurkuzNEoXs9DMNr8Ww&usqp=CAU" alt="" />
+                                <img src="https://www.kindpng.com/picc/m/495-4952535_create-digital-profile-icon-blue-user-profile-icon.png" alt="Profile Picture" />
                             </div>
                         </div>
-                        <Box component="fieldset" mb={3} borderColor="transparent">
-                            <Typography component="legend" align="left" > <Rating style={{ color: "#3f51b5" }} name="read-only" value={value} readOnly /></Typography>
+                        <div className="rating">
+                            <Box component="fieldset" mb={3} borderColor="transparent">
+                                <Typography component="legend" align="left" > <Rating style={{ color: "#3f51b5" }} name="read-only" value={4} readOnly /></Typography>
 
-                        </Box>
-                        <div>
-                            <h4>Gauravi</h4>
-                            <h4>Dob:-12/09/2021</h4>
-                            <h4>ID:2187454uydgawygayur8228</h4>
+                            </Box>
                         </div>
-                    </div>
+                        <div style={{ marginTop: "0px" }}>
+                            <div className="row">
+                                <h4>Full Name</h4>
+                                <h4 style={{ marginRight: "10px" }}>{pro.name}</h4>
+                            </div>
+                            <hr />
+                            <div className="row">
+                                <h4>Date of Birth</h4>
+                                <h4 style={{ marginRight: "10px" }}> {pro.dob}</h4>
+                            </div>
+                            <hr />
+                            <div className="row">
+                                <h4>Gender</h4>
+                                <h4 style={{ marginRight: "10px" }}> Unknown</h4>
+                            </div>
+                            <hr />
+                            <div className="row">
+                                <h4>Total Balance</h4>
+                                <h4 style={{ marginRight: "10px", color: pro.color }}>{pro.balance}</h4>
+                            </div>
+                            <hr />
+                            <div className="row">
+                                <h4>verified User</h4>
+                                <h4 style={{ marginRight: "10px" }}>{pro.verify}</h4>
+                            </div>
+                            <hr />
+                            <div className="row">
+                                <h4>ID:</h4>
+                                <h4 style={{ marginRight: "10px" }}>{pro.id}</h4>
+                            </div>
+                        </div>
+                        <div className="btn">
+                            <Link to="/about"><Button variant="contained" color="primary">
+                                See your transactions
+                            </Button></Link>
 
+
+
+                        </div>
+
+                    </div>
                     <div className="div2">
-                        <ul>
-                            <li>
-                                <Typography align="left" variant="p"  >
-                                    Address
-                                </Typography>
-                                <Typography align="left" component="legend" >
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui quas nostrum blanditiis, minus illo debitis nulla nihil rerum dolorem nemo sequi molestias fugit ad ab. Nemo illum optio placeat sapiente?
-                                </Typography>
-                            </li>
-                            <li>
-                                <Typography align="left" variant="p"  >
-                                    Address
-                                </Typography>
-                            </li>
-                        </ul>
+
+                        <div className="row">
+                            <h4 style={{ fontWeight: "700" }} >Address</h4>
+                        </div>
+                        <div className="row">
+                            <Typography align="left" component="legend" >
+                                Paliya pratap shah,Near Bank of Baroda ,Mungeshpur 224363,Bangalore
+                                India
+                            </Typography>
+                        </div>
+                        <div className="row">
+                            <h4 style={{ fontWeight: "700" }}>{accountType === "MERCHANT" ? "List of Shops" : "List of Merchants Connected"}</h4>
+                        </div>
+                        <div>
+                            {pro.shop.map((nd) => (
+                                <div className="row">
+                                    <h3>{nd.shopName}</h3>
+                                    <h3 style={{ marginRight: "10px", color: getColor(nd.balance.balance) }}>{nd.balance.balance}</h3>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="row1">
+                            <a href=""> <FacebookIcon style={{ fontSize: "4rem", color: "#3f51b5" }} /></a>
+                            <a href=""> <LocalPhoneIcon style={{ fontSize: "4rem", color: "#3f51b5" }} /> </a>
+                            <a href="">  <ContactMailIcon style={{ fontSize: "4rem", color: "#3f51b5" }} /></a>
+                        </div>
                     </div>
                 </div>
             </div>}
-
         </div >
     );
 }

@@ -19,34 +19,34 @@ const handleClick = () => {
 export const mainListItems = (
   <div>
     <Link to="/">
-    <ListItem button>
-      <ListItemIcon>
-        <DashboardIcon />
-      </ListItemIcon>
-      <ListItemText primary="Dashboard" />
-    </ListItem>
+      <ListItem button>
+        <ListItemIcon>
+          <DashboardIcon />
+        </ListItemIcon>
+        <ListItemText primary="Dashboard" />
+      </ListItem>
     </Link>
     <Link to="/requests">
-    <ListItem button>
-      <ListItemIcon>
-        <PeopleIcon />
-      </ListItemIcon>
-      <ListItemText primary="Requests" />
-      {/* <ListItemSecondaryAction>
+      <ListItem button>
+        <ListItemIcon>
+          <PeopleIcon />
+        </ListItemIcon>
+        <ListItemText primary="Requests" />
+        {/* <ListItemSecondaryAction>
         <Chip label="3" size="small" color="primary" />
       </ListItemSecondaryAction> */}
-    </ListItem>
+      </ListItem>
     </Link>
     <Link to="/transactions">
-    <ListItem button>
-      <ListItemIcon>
-        <BarChartIcon />
-      </ListItemIcon>
-      <ListItemText primary="Transactions" />
-      {/* <ListItemSecondaryAction>
+      <ListItem button>
+        <ListItemIcon>
+          <BarChartIcon />
+        </ListItemIcon>
+        <ListItemText primary="Transactions" />
+        {/* <ListItemSecondaryAction>
         <Chip label="4" size="small" />
       </ListItemSecondaryAction> */}
-    </ListItem>
+      </ListItem>
     </Link>
   </div>
 );
@@ -58,13 +58,16 @@ export const secondaryListItems = (
       <ListItemIcon>
         <AssignmentIcon />
       </ListItemIcon>
-      <ListItemText primary="Your Profile" />
+      <Link to="/profile">
+        <ListItemText primary="Your Profile" />
+      </Link>
+
     </ListItem>
     <ListItem button>
       <ListItemIcon onClick={handleClick}>
-        <CodeIcon/>
+        <CodeIcon />
       </ListItemIcon>
       <ListItemText onClick={handleClick} primary="Github Repo" />
-      </ListItem>
+    </ListItem>
   </div>
 );
