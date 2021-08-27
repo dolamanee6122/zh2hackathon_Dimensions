@@ -327,7 +327,8 @@ export default function CreateRequest(params) {
               >
                 <TextField
                   id="outlined-basic"
-                  label={shopName}
+                  label="Shop Name"
+                  value={shopName}
                   variant="outlined"
                   disabled
                 />
