@@ -9,7 +9,7 @@ import Dashboard from './Components/Dashboard/Dashboard';
 import CreateRequest from './Components/CreateRequest/CreateRequest';
 import AddShop from './Components/AddShop/AddShop';
 import Transactions from './Components/Transaction/Transactions';
-import Profile from './Components/Profile/Profile';
+import Profile from './Components/bProfile/Profile';
 
 function App() {
   const { creds, setCreds } = useCreds();
@@ -48,30 +48,30 @@ function App() {
               )}
             />
           }
-          
-            <Route path="/createrequest">
-              <CreateRequest/>
-            </Route>
-        
-      
-            <Route path="/addshop">
-              <AddShop />
-            </Route>
-        
-       <Route 
-        path="/requests"
-        render={(props) => (
-          <RequestListing {...props} handleLogout={handleLogout} />
-        )}
-        />
-        <Route path='/github' component={() => { 
-           window.location.href = 'https://github.com/dolamanee6122/Dimensions'; 
-           return null;
-        }}/>
 
-         <Route path="/transactions">
-              <Transactions/>
-            </Route>
+          <Route path="/createrequest">
+            <CreateRequest />
+          </Route>
+
+
+          <Route path="/addshop">
+            <AddShop />
+          </Route>
+
+          <Route
+            path="/requests"
+            render={(props) => (
+              <RequestListing {...props} handleLogout={handleLogout} />
+            )}
+          />
+          <Route path='/github' component={() => {
+            window.location.href = 'https://github.com/dolamanee6122/Dimensions';
+            return null;
+          }} />
+
+          <Route path="/transactions">
+            <Transactions />
+          </Route>
           <Route path="/profile">
             <Profile />
           </Route>
@@ -82,4 +82,3 @@ function App() {
 }
 
 export default App;
-     
