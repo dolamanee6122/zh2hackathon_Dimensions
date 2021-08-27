@@ -96,3 +96,10 @@ npm start
 > - "X_ZETA_AuthToken
 > - "Secret MongoURI"
 > - "jwt Secret"
+
+> - For Hackathon judgement only we are exposing the mongoURI for sometime, Create a new folder called "config" inside /server  and create a new file called "default.json"
+
+- Zeta  team will be having our X_Zeta_AuthToken, IFI_ID and BUNDLE_ID 
+-   "mongoURI": "mongodb+srv://dolamanee6122:Dolamanee@mongodb@1036@cluster0.xt3vs.mongodb.net/dimensions?retryWrites=true&w=majority"
+-  "jwtSecret": "KOTRAROADMEDARORATKOKOTRAROADMEDARORATKO"
+-  "FUSION_BASE_URL": ["https://fusion.preprod.zeta.in/api/v1"]
