@@ -182,6 +182,7 @@ export default function AddShop(params) {
         alert("Failed to add Shop");
         console.log(`err`, err);
       });
+      setLine1("");setLine2("");setCity("");setShopName("");setState("");setPinCode("");
   };
   const onShopNameChange = (e) => {
     setShopName(e.target.value);

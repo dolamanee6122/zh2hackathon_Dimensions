@@ -99,7 +99,7 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
   
-const DataElements = ({stats,request,id,accountType}) => {
+const DataElements = ({stats,request,id,accountType,trxns}) => {
     
     console.log('dstat',stats)
     const classes = useStyles();
@@ -114,7 +114,7 @@ const DataElements = ({stats,request,id,accountType}) => {
   
       var first = d.getDate() - d.getDay(); // First day is the day of the month - the day of the week
       var last = first + 6; // last day is the first day + 6
-  
+
       var firstday = new Date(d.setDate(first)).getDate()+ " "+monthNames[new Date(d.setDate(first)).getMonth()];
       var lastday = new Date(d.setDate(last)).getDate()+ " "+monthNames[new Date(d.setDate(last)).getMonth()];
   
@@ -164,7 +164,7 @@ const DataElements = ({stats,request,id,accountType}) => {
             {/* Transaction */}
             <Grid item xs={12} md={10} lg={7}>
               <Paper className={requests}>
-                <RecentTransactions />
+                <RecentTransactions trxns={trxns} />
               </Paper>
             </Grid>
             {/*Request*/}

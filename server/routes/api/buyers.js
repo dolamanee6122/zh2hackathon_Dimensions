@@ -26,12 +26,12 @@ const getInitialBalance = () => {
 router.post("/signin", async (req, res) => {
   const { email, password } = req.body;
   try {
-    const buyerLogin = await Buyer.findOne({ "user.email": email });
-    // if (
-    //   !buyerLogin ||
-    //   !(await bcrypt.compare(password, buyerLogin.user.password))
-    // )
-    //   return res.status(404).json({ message: "Invalid credentials" });
+    const buyerLogin = await Buyer.findOne({ "user.email": email }).select("user.password");
+    if (
+      !buyerLogin ||
+      !(await bcrypt.compare(password, buyerLogin.user.password))
+    )
+      return res.status(404).json({ message: "Invalid credentials" });
     const token = await buyerLogin.user.generateAuthToken(buyerLogin._id);
     res.json({
       message: "Signed In successfully",
