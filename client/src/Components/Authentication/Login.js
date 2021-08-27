@@ -232,9 +232,10 @@ const Login = ({ setCreds }) => {
         justifyContent: "space-evenly",
       }}
     >
-      <div>
+      <div  style={{display:"flex", flexDirection:"column", alignItems:"center"}}>
         <h1>DIMENSIONS</h1>
-        <Svg style={{ height: "50%", transform: "scale(0.5)" }} />
+        <h2>μ-Nim-G</h2>
+        <Svg style={{ height: "50%", transform: "scale(0.5)" }} className="svg" />
       </div>
       <div
         style={{

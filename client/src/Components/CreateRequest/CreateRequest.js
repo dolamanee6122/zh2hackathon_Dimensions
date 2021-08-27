@@ -350,12 +350,12 @@ export default function CreateRequest(params) {
                   <FormControlLabel
                     value="DEBIT"
                     control={<Radio />}
-                    label="Debit"
+                    label="Pay"
                   />
                   <FormControlLabel
                     value="CREDIT"
                     control={<Radio />}
-                    label="Credit"
+                    label="Ask for Credit"
                   />
                 </RadioGroup>
               </FormControl>

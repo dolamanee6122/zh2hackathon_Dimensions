@@ -134,6 +134,7 @@ export default function DashboardB({handleLogout}) {
   const [shops, setShops] = useState();
   const [request, setRequest] = useState();
   const [stats, setStats] = useState();
+  const [trxns,setTrxns] =useState();
 
   // const id = "61136f34480a693fb4d49453";
 
@@ -153,7 +154,9 @@ export default function DashboardB({handleLogout}) {
     console.log(`info`, info);
     setBuyerInfo(info.buyer);
     await fetchStats(id, "buyer");
+    await fetchTransactions(id);
     await fetchRequests(id);
+
     setLoading(false);
   }
   async function fetchRequests(id) {
@@ -166,13 +169,24 @@ export default function DashboardB({handleLogout}) {
     setLoading(false);
   }
 
+    async function fetchTransactions(id) {
+    console.log("@trn");
+    const URL = BASE_URL + "transaction/" + id + "/?limit=3";
+    const response = await fetch(`${URL}`);
+    const info = await response.json();
+    console.log("Trxn in DBBBBBBBBBBBBBBBBBooooo------------->", info);
+    // setRequest(info.reque);
+    setTrxns(info.transactions);
+  }
+
+
   async function fetchStats(id, type) {
     console.log("from fetchStats");
     const URL =BASE_URL + "transaction/balanceanalytics/" + id + "/?type=" + type;
     console.log(`URL`, URL);
     const response = await fetch(`${URL}`);
     const info = await response.json();
-    console.log("stats------------------->", info);
+    console.log("stats--------->", info);
     setStats(info.balanceAnalytics);
   }
 
@@ -255,6 +269,7 @@ export default function DashboardB({handleLogout}) {
               <DataElements
                 stats={stats}
                 request={request}
+                trxns={trxns}
                 id={id}
                 accountType={"buyer"}
               />

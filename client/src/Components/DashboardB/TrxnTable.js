@@ -24,10 +24,10 @@ const TrxnTable = ({ rows }) => {
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.id}>
-              <TableCell>{row.date}</TableCell>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.shipTo}</TableCell>
-              <TableCell>{row.paymentMethod}</TableCell>
+              <TableCell>{row.createdAt.substr(0,10)}</TableCell>
+              <TableCell>{row.shopName}</TableCell>
+              <TableCell>{row.merchantName}</TableCell>
+              <TableCell>{row.paymentMode}</TableCell>
               <TableCell align="right">{row.amount}</TableCell>
             </TableRow>
           ))}

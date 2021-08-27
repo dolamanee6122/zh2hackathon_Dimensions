@@ -322,9 +322,8 @@ const getBalanceAnalytics = async (objID, type, timeline) => {
       else debit += e.amount;
     }
   });
-  balance = credit - debit;
   return {
-    balance: credit - debit,
+    balance: debit - credit ,
     debit,
     credit,
   };

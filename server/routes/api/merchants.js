@@ -25,13 +25,13 @@ const getInitialBalance = () => {
 router.post("/signin", async (req, res) => {
   const { email, password } = req.body;
   try {
-    const merchantLogin = await Merchant.findOne({ "user.email": email });
+    const merchantLogin = await Merchant.findOne({ "user.email": email }).select("user.password");
     console.log("merchnat ppppppppppas",merchantLogin);
-    // // if (
-    // //   !merchantLogin ||
-    // //   !(await bcrypt.compare(password, merchantLogin.user.password))
-    // // )
-    //   return res.status(404).json({ message: "Invalid credentials" });
+    if (
+      !merchantLogin ||
+      !(await bcrypt.compare(password, merchantLogin.user.password))
+    )
+      return res.status(404).json({ message: "Invalid credentials" });
     const token = await merchantLogin.user.generateAuthToken(merchantLogin._id);
     res.json({
       message: "Signed In successfully",
