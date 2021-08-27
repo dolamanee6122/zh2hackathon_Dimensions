@@ -24,7 +24,7 @@ import {
   MenuItem,
   Select,
 } from "@material-ui/core";
-import EachRequest from "../Dashboard/EachRequest";
+import EachRequest from "../DashboardB/EachRequest";
 import { useLocation } from "react-router-dom";
 const drawerWidth = 240;
 

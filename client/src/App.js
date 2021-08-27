@@ -1,15 +1,17 @@
-import './App.css';
+import "./App.css";
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
-import RequestListing from './Components/RequestPage/RequestListing';
-import DashboardB from './Components/DashboardB/DashboardB';
-import Login from './Components/Authentication/Login';
-import { useState } from 'react';
-import { useCreds } from './Components/Authentication/useCreds';
-import Dashboard from './Components/Dashboard/Dashboard';
-import CreateRequest from './Components/CreateRequest/CreateRequest';
-import AddShop from './Components/AddShop/AddShop';
-import Transactions from './Components/Transaction/Transactions';
-import Profile from './Components/bProfile/Profile';
+import RequestListing from "./Components/RequestPage/RequestListing";
+import RequestListingB from "./Components/RequestPage/RequestListingB";
+import DashboardB from "./Components/DashboardB/DashboardB";
+import Login from "./Components/Authentication/Login";
+import { useState } from "react";
+import { useCreds } from "./Components/Authentication/useCreds";
+import Dashboard from "./Components/Dashboard/Dashboard";
+import CreateRequest from "./Components/CreateRequest/CreateRequest";
+import ShopList from "./Components/CreateRequest/ShopList";
+import AddShop from "./Components/AddShop/AddShop";
+import Transactions from "./Components/Transaction/Transactions";
+import Profile from "./Components/bProfile/Profile";
 
 function App() {
   const { creds, setCreds } = useCreds();
@@ -18,56 +20,80 @@ function App() {
   const token = creds.token;
   const accountType = creds.accountType;
   if (!token) {
-    return <Login setCreds={setCreds} />
+    return <Login setCreds={setCreds} />;
   }
 
   const handleLogout = (e) => {
     e.preventDefault();
     window.location.reload(true);
     localStorage.clear();
-  }
+  };
 
   return (
     <div className="App">
       <Router>
         <Switch>
-          {accountType === 'BUYER' &&
+          {accountType === "BUYER" && (
             <Route
-              exact path="/"
+              exact
+              path="/"
               render={(props) => (
                 <DashboardB {...props} handleLogout={handleLogout} />
               )}
             />
-
-          }
-          {accountType === 'MERCHANT' &&
+          )}
+          {accountType === "MERCHANT" && (
             <Route
-              exact path="/"
+              exact
+              path="/"
               render={(props) => (
                 <Dashboard {...props} handleLogout={handleLogout} />
               )}
             />
-          }
-
+          )}
+          {accountType === "BUYER" && (
+            <Route
+              path="/requests"
+              render={(props) => (
+                <RequestListingB {...props} handleLogout={handleLogout} />
+              )}
+            />
+          )}
+          {accountType === "MERCHANT" && (
+            <Route
+              path="/requests"
+              render={(props) => (
+                <RequestListing {...props} handleLogout={handleLogout} />
+              )}
+            />
+          )}
           <Route path="/createrequest">
-            <CreateRequest />
+            <ShopList />
           </Route>
 
+          <Route
+            path="/fillrequest"
+            render={(props) => <CreateRequest {...props} />}
+          />
 
           <Route path="/addshop">
             <AddShop />
           </Route>
-
+          {/* 
           <Route
             path="/requests"
             render={(props) => (
               <RequestListing {...props} handleLogout={handleLogout} />
             )}
+          /> */}
+          <Route
+            path="/github"
+            component={() => {
+              window.location.href =
+                "https://github.com/dolamanee6122/Dimensions";
+              return null;
+            }}
           />
-          <Route path='/github' component={() => {
-            window.location.href = 'https://github.com/dolamanee6122/Dimensions';
-            return null;
-          }} />
 
           <Route path="/transactions">
             <Transactions />
