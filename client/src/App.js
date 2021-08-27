@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useCreds } from './Components/Authentication/useCreds';
 import Dashboard from './Components/Dashboard/Dashboard';
 import CreateRequest from './Components/CreateRequest/CreateRequest';
+import ShopList from './Components/CreateRequest/ShopList';
 import AddShop from './Components/AddShop/AddShop';
 import Transactions from './Components/Transaction/Transactions';
 import Profile from './Components/Profile/Profile';
@@ -49,9 +50,14 @@ function App() {
             />
           }
           
-            <Route path="/createrequest">
-              <CreateRequest/>
+          <Route path="/createrequest">
+              <ShopList />
             </Route>
+        
+            <Route path="/fillrequest"
+              render={(props) => (
+          <CreateRequest {...props} />
+        )}/>
         
       
             <Route path="/addshop">

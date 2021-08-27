@@ -168,11 +168,13 @@ export default function CreateRequest(params) {
     }
     */
 
-  const initShopList = async () => {
-    const res = await fetch(BASE_URL + "shop");
-    const data = await res.json();
-    console.log(data);
-    setInfo(data.shops);
+  const initShopList =() => {
+    // setShopID(JSON.parse(localStorage.getItem("shopRequestID")));
+    // setShopName(JSON.parse(localStorage.getItem("shopRequestName")));
+    // console.log(shopName,shopID);
+    console.log(params);
+    setShopID(params.location.data.id);
+    setShopName(params.location.data.name);
   };
   useEffect(() => {
     initShopList();
@@ -200,7 +202,7 @@ export default function CreateRequest(params) {
       .then((data) => {
         alert("Request done..wait for merchant to accept");
         //redirecting to dashboard page
-        // window.location.href = "/";
+        window.location.href = "/";
       })
       .catch((err) => {
         alert("Failed to request");
@@ -293,7 +295,7 @@ export default function CreateRequest(params) {
         <Container maxWidth="lg" className={classes.container}>
           <div className="container">
             <form onSubmit={sendRequest}>
-              <FormControl variant="outlined" className={classes.formControl} 
+              {/* <FormControl variant="outlined" className={classes.formControl} 
                 style={{textAlign:"left"}}
               >
               <InputLabel id="demo-simple-select-outlined-label">
@@ -317,8 +319,18 @@ export default function CreateRequest(params) {
                     );
                   })}
                 </Select>
-              </FormControl>
+              </FormControl> */}
               { shopID !== "none" && <>
+              <FormControl 
+                style={{ display: "block", margin: "10px 0 10px 0",  }}
+              >
+                <TextField
+                  id="outlined-basic"
+                  label={shopName}
+                  variant="outlined"
+                  disabled
+                />
+              </FormControl>
               <FormControl 
                 style={{ display: "block", margin: "10px 0 10px 0",  }}
               >
